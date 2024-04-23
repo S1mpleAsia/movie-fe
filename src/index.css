@@ -1,13 +1,59 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.triangle {
+  stroke-dasharray: 240;
+  stroke-dashoffset: 480;
+  stroke: white;
+  transform: translateY(0);
+  transition: all 0.7s ease-in-out;
+}
+.circle {
+  stroke: white;
+  stroke-dasharray: 650;
+  stroke-dashoffset: 1300;
+  transition: all 0.5s ease-in-out;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.triangle:hover {
+  stroke-dashoffset: 0;
+  opacity: 1;
+  stroke: #da2f68;
+  animation: trailorPlay 0.7s ease-in-out;
+}
+
+.circle:hover {
+  stroke-dashoffset: 0;
+  stroke: #da2f68;
+}
+
+.authText .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #6062e8;
+}
+
+.authText .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #6062e8;
+}
+
+.authText .MuiInputLabel-root.Mui-focused {
+  color: #6062e8;
+}
+
+.genderText .MuiOutlinedInput-notchedOutline {
+  border-color: white;
+  opacity: 0.5;
+}
+
+.genderText.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #6062e8;
+}
+
+.genderText.MuiSvgIcon-root {
+  fill: white !important;
+}
+
+.genderText:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #6062e8;
+}
+
+.custom-overlay {
+  width: 100%;
+  height: 100%;
 }
