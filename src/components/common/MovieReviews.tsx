@@ -1,99 +1,27 @@
 import { useSelector } from "react-redux";
-import {
-  FeedbackOverallResponse,
-  FeedbackType,
-} from "../../types/FeedbackType";
+import { FeedbackOverallResponse } from "../../types/FeedbackType";
 import { RootState } from "../../redux/store";
 import { useEffect, useState } from "react";
 import { GeneralType } from "../../types/GeneralType";
-import { Avatar, Box, Rating, Stack, Typography } from "@mui/material";
-import dayjs from "dayjs";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { LoadingButton } from "@mui/lab";
-import TextAvatar from "./TextAvatar";
+import {
+  Avatar,
+  Box,
+  Button,
+  Rating,
+  Stack,
+  TextareaAutosize,
+  Typography,
+} from "@mui/material";
 import { MovieOverviewType } from "../../types/MovieType";
 import { useDispatch } from "react-redux";
-import { setGlobalLoading } from "../../redux/features/globalLoadingSlice";
 import { feedbackAPI } from "../../api/modules/feedback.api";
 import { toast } from "react-toastify";
 import BorderLinearProgress from "./BorderLinearProgress";
 import FeedbackMenu from "./FeedbackMenu";
-
-type ReviewItemProps = {
-  review: FeedbackType;
-  onRemoved: () => void;
-};
+import MinHeightTextarea from "./Textarea";
 
 type MoviewReviewsProps = {
   movie: MovieOverviewType;
-};
-
-const ReviewItem = ({ review, onRemoved }: ReviewItemProps) => {
-  const { user } = useSelector((state: RootState) => state.user);
-
-  const [onRequest, setOnRequest] = useState(false);
-  const [feedbackOverall, setFeedbackOverall] =
-    useState<FeedbackOverallResponse>();
-  const onRemove = async () => {
-    if (onRequest) return;
-    setOnRequest(true);
-
-    // const response = await api
-  };
-
-  return (
-    <Box
-      sx={{
-        padding: 2,
-        borderRadius: "5px",
-        position: "relative",
-        opacity: onRequest ? 0.6 : 1,
-        "&:hover": {
-          backgroundColor: "background.paper",
-        },
-      }}
-    >
-      <Stack direction="row" spacing={2}>
-        {/* Avatar */}
-        <TextAvatar text="Duong Vu" />
-        {/* Avatar */}
-
-        <Stack spacing={2} flexGrow={1}>
-          <Stack spacing={1}>
-            <Typography variant="h6" fontWeight="700">
-              ADMIN
-            </Typography>
-
-            <Typography variant="h6" fontWeight="700">
-              {dayjs("2024-07-12 05:59:30").format("DD-MM-YYYY HH:mm:ss")}
-            </Typography>
-          </Stack>
-
-          <Typography variant="body1" textAlign="justify">
-            This is my review
-          </Typography>
-
-          {user && user.id === review.userId && (
-            <LoadingButton
-              variant="contained"
-              startIcon={<DeleteIcon />}
-              loadingPosition="start"
-              loading={onRequest}
-              onClick={onRemove}
-              sx={{
-                position: { xs: "relative", md: "absolute" },
-                right: { xs: 0, md: "10px" },
-                marginTop: { xs: 2, md: 0 },
-                width: "max-content",
-              }}
-            >
-              remove
-            </LoadingButton>
-          )}
-        </Stack>
-      </Stack>
-    </Box>
-  );
 };
 
 const MovieReviews = ({ movie }: MoviewReviewsProps) => {
@@ -104,6 +32,8 @@ const MovieReviews = ({ movie }: MoviewReviewsProps) => {
   );
   const [feedbackOverall, setFeedbackOverall] =
     useState<FeedbackOverallResponse>();
+
+  const [feedback, setFeedback] = useState<string>("");
 
   useEffect(() => {
     const getFeedbackOverall = async () => {
@@ -329,7 +259,62 @@ const MovieReviews = ({ movie }: MoviewReviewsProps) => {
         </Box>
       </Box>
 
-      <Box className="personal-feedback"></Box>
+      <Box
+        className="personal-feedback"
+        marginTop="40px"
+        display="flex"
+        flexDirection="column"
+        gap={3}
+      >
+        <Typography fontStyle="italic" fontSize="1.3rem" sx={{ opacity: 1 }}>
+          Please let us know your feedback 🎉️🎉
+        </Typography>
+
+        <Box display="flex" flexDirection="row" gap={5}>
+          <Avatar
+            variant="square"
+            src={require("../../assets/no-avatar.png")}
+            sx={{
+              width: "4rem",
+              height: "4rem",
+              borderRadius: "10px",
+              display: {
+                xs: "none",
+                md: "block",
+              },
+            }}
+          />
+
+          <Stack direction="column" spacing={2}>
+            <Box display="flex" flexDirection="row" gap={2} alignItems="center">
+              <Typography fontSize="1.2rem" fontWeight="700">
+                Rating:
+              </Typography>
+              <Rating name="size-medium" size="medium" defaultValue={3} />
+            </Box>
+
+            <Box display="flex" flexDirection="column" gap={2}>
+              <Typography fontSize="1.2rem" fontWeight="700">
+                Your feedback (optional):
+              </Typography>
+
+              <MinHeightTextarea />
+
+              <Button
+                sx={{
+                  backgroundColor: "#6062e8",
+                  color: "#fff",
+                  "&:hover": {
+                    backgroundColor: "#6062e8",
+                  },
+                }}
+              >
+                Submit
+              </Button>
+            </Box>
+          </Stack>
+        </Box>
+      </Box>
     </Box>
   );
 };
