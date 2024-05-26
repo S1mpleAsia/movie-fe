@@ -1,38 +1,52 @@
-.triangle {
+html,
+body,
+:root,
+#root {
+  --bg-height: 250px;
+  --avatar-width: 10rem;
+}
+
+.playbtn .triangle {
   stroke-dasharray: 240;
   stroke-dashoffset: 480;
   stroke: white;
   transform: translateY(0);
   transition: all 0.7s ease-in-out;
 }
-.circle {
+
+.playbtn .circle {
   stroke: white;
   stroke-dasharray: 650;
   stroke-dashoffset: 1300;
   transition: all 0.5s ease-in-out;
 }
 
-.triangle:hover {
+.playbtn:hover .triangle {
   stroke-dashoffset: 0;
   opacity: 1;
   stroke: #da2f68;
   animation: trailorPlay 0.7s ease-in-out;
 }
 
-.circle:hover {
+.playbtn:hover .circle {
   stroke-dashoffset: 0;
   stroke: #da2f68;
 }
 
-.authText .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+.authText,
+.searchText .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
   border-color: #6062e8;
 }
 
-.authText .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+.authText,
+.searchText
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
   border-color: #6062e8;
 }
 
-.authText .MuiInputLabel-root.Mui-focused {
+.authText,
+.searchText .MuiInputLabel-root.Mui-focused {
   color: #6062e8;
 }
 
@@ -56,4 +70,85 @@
 .custom-overlay {
   width: 100%;
   height: 100%;
+}
+
+.genresDD {
+  width: 50%;
+}
+
+.sortbyDD {
+  width: 50%;
+}
+
+.react-select__control {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background-color: #6062e8 !important;
+  color: white !important;
+  border-radius: 20px !important;
+}
+
+.react-select__control
+  .react-select__value-container
+  .react-select__placeholder,
+.react-select__control
+  .react-select__value-container
+  .react-select__input-container {
+  color: #fff;
+  margin: 0 10px;
+}
+
+.react-select__control .react-select__single-value {
+  color: white !important;
+}
+
+.react-select__control .react-select__multi-value {
+  background-color: #da2f68 !important;
+  border-radius: 20px !important;
+}
+
+.react-select__control
+  .react-select__multi-value
+  .react-select__multi-value__label {
+  color: white !important;
+}
+
+.react-select__control
+  .react-select__multi-value
+  .react-select__multi-value__remove {
+  background-color: transparent !important;
+  color: white !important;
+  cursor: pointer !important;
+}
+
+.react-select__multi-value .react-select__multi-value__remove:hover {
+  color: white !important;
+}
+
+.react-select__menu {
+  margin: 0 !important;
+  background-color: #6062e8 !important;
+  color: white !important;
+}
+
+.react-select__menu .react-select__menu-list .react-select__option {
+  background-color: #6062e8;
+}
+
+.react-select__menu .react-select__menu-list .react-select__option:hover {
+  background-color: #9091ef !important;
+}
+
+.videoPopup.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.videoPopup.visible .opacityLayer {
+  opacity: 1;
+}
+
+.videoPopup.visible .videoPlayer {
+  transform: scale(1);
 }

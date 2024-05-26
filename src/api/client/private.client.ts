@@ -14,7 +14,7 @@ const privateClient = axios.create({
 privateClient.interceptors.request.use(
   (config) => {
     // Retrieve the token from wherever you stored it
-    const token = sessionStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -27,17 +27,6 @@ privateClient.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-privateClient.interceptors.response.use(
-  (response) => {
-    if (response && response.data) return response.data;
-    return response;
-  },
-  (err) => {
-    throw err.response.data;
-  }
-);
-
 export default privateClient;
 
 export {};

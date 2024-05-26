@@ -2,7 +2,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { RootState } from "../redux/store";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -16,29 +16,39 @@ import { LoadingButton } from "@mui/lab";
 import Container from "../components/common/Container";
 import CastSlide from "../components/common/CastSlide";
 import { GeneralType } from "../types/GeneralType";
-import { GenreType, MovieOverviewType } from "../types/MovieType";
+import { MovieOverviewType } from "../types/MovieType";
 import { getImage, storageImage } from "../utils/constant";
 import { toast } from "react-toastify";
-import { setAuthModalOpen } from "../redux/features/authModalSlice";
 import { PlayIcon } from "../components/common/PlayIcon";
+import ShareIcon from "@mui/icons-material/Share";
 import MovieVideoSlide from "../components/common/MovieVideoSlide";
 import MovieGallery from "../components/common/MovieGallery";
 import RecommendationSlide from "../components/common/RecommendationSlide";
 import MovieReviews from "../components/common/MovieReviews";
+import { preferenceAPI } from "../api/modules/preference.api";
+import {
+  CheckPreferenceResponse,
+  UserPreferenceRequest,
+} from "../types/PreferenceType";
+import timeUtils from "../utils/time.utils";
+import TrailerPopup from "../components/common/TrailerPopup";
+import SharingPopup from "../components/common/SharingPopup";
 
 const MovieDetail = () => {
   const { movieId } = useParams();
+  const { user } = useSelector((state: RootState) => state.user);
 
-  const { user, listFavourites } = useSelector(
-    (state: RootState) => state.user
-  );
-  const [movie, setMovie] = useState<GeneralType<MovieOverviewType>>();
+  const [movie, setMovie] = useState<MovieOverviewType>();
   const [movieList, setMovieList] =
     useState<GeneralType<MovieOverviewType[]>>();
   const [isFavourite, setIsFavourite] = useState(false);
   const [onRequest, setOnRequest] = useState(false);
+  const [showTrailer, setShowTrailer] = useState(false);
+  const [showSharing, setShowSharing] = useState(false);
+  const [videoId, setVideoId] = useState<string | null>(null);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -56,6 +66,21 @@ const MovieDetail = () => {
       }
     };
 
+    const checkFavourite = async () => {
+      const response: GeneralType<CheckPreferenceResponse> = (
+        await preferenceAPI.checkPreference(
+          user?.id || null,
+          parseInt(movieId || "-1")
+        )
+      ).data;
+
+      if (response.status.statusCode !== 200) {
+        toast.error(response.status.message);
+      } else {
+        setIsFavourite(response.data.isFavourite);
+      }
+    };
+
     const getMovie = async () => {
       dispatch(setGlobalLoading(true));
       const response: GeneralType<MovieOverviewType> = (
@@ -65,29 +90,52 @@ const MovieDetail = () => {
       if (response.status.statusCode !== 200) {
         toast.error(response.status.message);
       } else {
-        setMovie(response);
+        setMovie(response.data);
         dispatch(setGlobalLoading(false));
       }
 
       getMovieList();
+      checkFavourite();
     };
 
     getMovie();
-  }, [movieId, dispatch]);
+  }, [movieId, dispatch, user?.id]);
 
   const onFavouriteClick = async () => {
-    if (!user) return dispatch(setAuthModalOpen(true));
+    if (!user) {
+      setOnRequest(true);
+
+      setTimeout(() => {
+        navigate("/sign-in");
+        setOnRequest(false);
+      }, 1000);
+    }
 
     if (onRequest) return;
 
-    if (isFavourite) {
-    }
+    const request: UserPreferenceRequest = {
+      userId: user?.id,
+      movieId: parseInt(movieId || "-1"),
+    };
+
+    const response: GeneralType<string> = (
+      await preferenceAPI.togglePreference(request)
+    ).data;
+
+    if (response.data) {
+      setIsFavourite(!isFavourite);
+      toast.success(response.data);
+    } else toast.error("Update failed");
+  };
+
+  const onSharingClick = () => {
+    setShowSharing(true);
   };
 
   return movie ? (
     <>
       <ImageHeader
-        imgPath={getImage(storageImage.originalPath, movie.data.backdropPath)}
+        imgPath={getImage(storageImage.originalPath, movie.backdropPath)}
       />
       <Box
         sx={{
@@ -118,7 +166,7 @@ const MovieDetail = () => {
                 sx={{
                   paddingTop: "140%",
                   ...uiConfigs.style.backgroundImage(
-                    getImage(storageImage.w500Path, movie.data.posterPath)
+                    getImage(storageImage.w500Path, movie.posterPath)
                   ),
                 }}
               />
@@ -140,16 +188,16 @@ const MovieDetail = () => {
                   fontWeight="700"
                   sx={{ ...uiConfigs.style.typoLines(2, "left") }}
                 >
-                  {movie.data.title}
+                  {movie.title}
                 </Typography>
                 {/* Title */}
 
                 {/* Rate and genres */}
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <CircularRate value={movie.data.voteAverage} />
+                  <CircularRate value={movie.voteAverage} />
                   <Divider orientation="vertical" />
                   {movie &&
-                    movie.data.genreList
+                    movie.genreList
                       .slice(0, 2)
                       .map((genre, index) => (
                         <Chip
@@ -174,7 +222,7 @@ const MovieDetail = () => {
                   variant="body1"
                   sx={{ ...uiConfigs.style.typoLines(5) }}
                 >
-                  {movie.data.overview}
+                  {movie.overview}
                 </Typography>
                 {/* Overview */}
 
@@ -189,6 +237,12 @@ const MovieDetail = () => {
                       color: "#da2f68",
                     },
                   }}
+                  className="playbtn"
+                  onClick={() => {
+                    console.log("Watch trailer", movie);
+                    setShowTrailer(true);
+                    setVideoId(movie.trailer.videoKey);
+                  }}
                 >
                   <PlayIcon />
                   <Typography
@@ -196,7 +250,7 @@ const MovieDetail = () => {
                     fontSize={{ xs: "1rem", md: "1rem", lg: "2rem" }}
                     fontWeight="700"
                     sx={{
-                      transition: "all 0.3s ease-in-out",
+                      transition: "all 0.7s ease-in-out",
                     }}
                   >
                     Watch Trailer
@@ -221,6 +275,20 @@ const MovieDetail = () => {
                     }
                     loadingPosition="start"
                     loading={onRequest}
+                    onClick={onFavouriteClick}
+                  />
+
+                  <LoadingButton
+                    variant="text"
+                    sx={{
+                      width: "max-content",
+                      "& .MuiButton-startIcon": { marginRight: 0 },
+                    }}
+                    size="large"
+                    startIcon={<ShareIcon />}
+                    loadingPosition="start"
+                    loading={onRequest}
+                    onClick={onSharingClick}
                   />
 
                   <Button
@@ -228,7 +296,7 @@ const MovieDetail = () => {
                     sx={{ width: "max-content" }}
                     size="large"
                     startIcon={<PlayArrowIcon />}
-                    onClick={() => {}}
+                    onClick={() => navigate(`/movie/watch/${movieId}`)}
                   >
                     Watch now
                   </Button>
@@ -251,7 +319,7 @@ const MovieDetail = () => {
                         fontSize={{ xs: "1rem", md: "1rem", lg: "1rem" }}
                         sx={{ opacity: 0.6 }}
                       >
-                        {movie.data.status}
+                        {movie.status}
                       </Typography>
                     </Box>
 
@@ -261,7 +329,7 @@ const MovieDetail = () => {
                         fontSize={{ xs: "1rem", md: "1rem", lg: "1rem" }}
                         sx={{ opacity: 0.6 }}
                       >
-                        2024, October
+                        {timeUtils.formatDateToString(movie.releaseDate)}
                       </Typography>
                     </Box>
 
@@ -276,7 +344,7 @@ const MovieDetail = () => {
                         fontSize={{ xs: "1rem", md: "1rem", lg: "1rem" }}
                         sx={{ opacity: 0.6 }}
                       >
-                        {movie.data.runtime}
+                        {timeUtils.convertMovieRuntime(movie.runtime)}
                       </Typography>
                     </Box>
                   </Stack>
@@ -302,14 +370,16 @@ const MovieDetail = () => {
         {/* Movie content */}
 
         <Container header="Cast">
-          <CastSlide casts={movie.data.credits} />
+          <CastSlide casts={movie.credits} />
         </Container>
 
         {/* Movie video */}
         <div ref={videoRef} style={{ paddingTop: "20px" }}>
           <Container header="Official Videos">
-            {movie?.data.videos.length > 0 ? (
-              <MovieVideoSlide videos={movie.data.videos.splice(0, 5)} />
+            {movie?.videos.length > 0 ? (
+              <MovieVideoSlide
+                videos={movie.videos.filter((movie, idx) => idx < 5)}
+              />
             ) : (
               <Typography
                 fontSize={{ xs: "0.5rem", md: "0.5rem", lg: "1rem" }}
@@ -325,8 +395,8 @@ const MovieDetail = () => {
 
         {/* Movie Grid Image */}
         <Container header="Gallery">
-          {movie?.data.imageList.length > 0 ? (
-            <MovieGallery images={movie.data.imageList} />
+          {movie?.imageList.length > 0 ? (
+            <MovieGallery images={movie.imageList} />
           ) : (
             <Typography
               fontSize={{ xs: "0.5rem", md: "0.5rem", lg: "1rem" }}
@@ -341,7 +411,7 @@ const MovieDetail = () => {
 
         {/* Feedback */}
         <Container header="Reviews">
-          <MovieReviews movie={movie.data} />
+          <MovieReviews movie={movie} />
         </Container>
         {/* Feedback */}
 
@@ -361,6 +431,19 @@ const MovieDetail = () => {
         </Container>
         {/* Recommendation movie */}
       </Box>
+
+      <SharingPopup
+        show={showSharing}
+        setShow={setShowSharing}
+        movieId={parseInt(movieId || "-1")}
+      />
+
+      <TrailerPopup
+        show={showTrailer}
+        setShow={setShowTrailer}
+        videoId={videoId}
+        setVideoId={setVideoId}
+      />
     </>
   ) : null;
 };

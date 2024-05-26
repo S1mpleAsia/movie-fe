@@ -16,9 +16,8 @@ import { setThemeMode } from "../../redux/features/themeModeSlice";
 import { DarkModeOutlined, Menu, WbSunnyOutlined } from "@mui/icons-material";
 import Logo from "./Logo";
 import menuConfigs from "../../configs/menu.config";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import UserMenu from "./UserMenu";
-import { setAuthModalOpen } from "../../redux/features/authModalSlice";
 import Sidebar from "./Sidebar";
 
 type ScrollAppbarProps = {
@@ -26,7 +25,7 @@ type ScrollAppbarProps = {
   window?: () => Window;
 };
 
-const ScrollAppbar = ({ children, window }: ScrollAppbarProps) => {
+export const ScrollAppbar = ({ children, window }: ScrollAppbarProps) => {
   const { themeMode } = useSelector((state: RootState) => state.themeMode);
 
   const trigger = useScrollTrigger({
@@ -55,6 +54,7 @@ const Topbar = () => {
   const { user } = useSelector((state: RootState) => state.user);
   const { appState } = useSelector((state: RootState) => state.appState);
   const { themeMode } = useSelector((state: RootState) => state.themeMode);
+  const navigate = useNavigate();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const dispatch = useDispatch();
@@ -131,7 +131,7 @@ const Topbar = () => {
               {!user && (
                 <Button
                   variant="contained"
-                  onClick={() => dispatch(setAuthModalOpen(true))}
+                  onClick={() => navigate("/sign-in")}
                 >
                   Sign in
                 </Button>

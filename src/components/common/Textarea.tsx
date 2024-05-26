@@ -2,7 +2,13 @@ import * as React from "react";
 import { TextareaAutosize as BaseTextareaAutosize } from "@mui/base/TextareaAutosize";
 import { styled } from "@mui/system";
 
-export default function MinHeightTextarea() {
+type MinHeightTextareaProps = {
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
+};
+
+export default function MinHeightTextarea({
+  textareaRef,
+}: MinHeightTextareaProps) {
   const blue = {
     100: "#DAECFF",
     200: "#b6daff",
@@ -58,8 +64,13 @@ export default function MinHeightTextarea() {
   `
   );
 
+  const setValue = (value: string) => {
+    textareaRef.current!.value = value;
+  };
+
   return (
     <Textarea
+      ref={textareaRef}
       aria-label="minimum height"
       minRows={4}
       placeholder="Enter your feedback"
@@ -72,6 +83,17 @@ export default function MinHeightTextarea() {
 
         resize: "none",
       }}
+      onChange={(e) => setValue(e.target.value)}
+      // value={feedbackRequest.feedback || ""}
+      // onChange={(e) =>
+      //   setFeedbackRequest({ ...feedbackRequest, feedback: e.target.value })
+      // }
+      // onFocus={(e) =>
+      //   e.currentTarget.setSelectionRange(
+      //     e.currentTarget.value.length,
+      //     e.currentTarget.value.length
+      //   )
+      // }
     />
   );
 }

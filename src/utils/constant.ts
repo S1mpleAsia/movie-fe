@@ -1,4 +1,4 @@
-const baseEndpoint = "http://127.0.0.1:9000/movie-system/";
+export const baseEndpoint = "http://127.0.0.1:9000/movie-system/";
 
 export const storageImage = {
   originalPath: baseEndpoint + "uploadFiles/original/",

@@ -2,7 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { MovieOverviewType } from "../../types/MovieType";
 import { CredentialType } from "../../types/CredentialType";
 
-type UserSliceState = {
+export type UserSliceState = {
   user: CredentialType | null;
   listFavourites: MovieOverviewType[];
 };
@@ -17,14 +17,15 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
+      console.log(action.payload);
       if (action.payload === null) {
         localStorage.removeItem("token");
+        localStorage.removeItem("persist:root");
       } else {
-        if (action.payload.token)
-          localStorage.setItem("token", action.payload.token);
+        if (action.payload.data.token)
+          localStorage.setItem("token", action.payload.data.token);
+        state.user = action.payload.data;
       }
-
-      state.user = action.payload;
     },
 
     setListFavourites: (state, action) => {

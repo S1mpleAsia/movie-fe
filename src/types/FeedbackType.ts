@@ -6,6 +6,8 @@ export interface FeedbackType {
   movieId: number;
   feedback: string;
   vote: number;
+  createdAt: Date;
+  updatedAt: Date;
   userCredential: CredentialType;
 }
 
@@ -24,11 +26,19 @@ export interface FeedbackOverallResponse {
 export interface FeedbackRequest {
   movieId: number;
   userId: string;
-  feedback: string;
-  vote: number;
+  feedback: string | null;
+  vote: number | null;
 }
 
 export interface FeedbackResponse {
+  id: string;
+  movieId: number;
+  feedback: string;
+  vote: number;
+  userId: string;
+}
+
+export interface FeedbackUpdateRequest {
   id: string;
   movieId: number;
   feedback: string;

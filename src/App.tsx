@@ -5,10 +5,11 @@ import themeConfigs from "./configs/theme.config";
 import { ToastContainer } from "react-toastify";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import MainLayout from "./components/layout/MainLayout";
-import routes, { authRoutes } from "./routes/route";
+import routes, { adminRoutes, authRoutes } from "./routes/route";
 import PageWrapper from "./components/common/PageWrapper";
 
 import "react-toastify/dist/ReactToastify.css";
+import AdminLayout from "./components/layout/AdminLayout";
 
 function App() {
   const { themeMode } = useSelector((state: RootState) => state.themeMode);
@@ -30,23 +31,43 @@ function App() {
       {/* Routing */}
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<MainLayout />}>
-            {routes.map((route, index) =>
-              route.index ? (
-                <Route
-                  index
-                  key={index}
-                  element={
-                    route.state ? (
-                      <PageWrapper state={route.state}>
-                        {route.element}
-                      </PageWrapper>
-                    ) : (
-                      route.element
-                    )
-                  }
-                />
-              ) : (
+          <Route path="">
+            <Route path="/" element={<MainLayout />}>
+              {routes.map((route, index) =>
+                route.index ? (
+                  <Route
+                    index
+                    key={index}
+                    element={
+                      route.state ? (
+                        <PageWrapper state={route.state}>
+                          {route.element}
+                        </PageWrapper>
+                      ) : (
+                        route.element
+                      )
+                    }
+                  />
+                ) : (
+                  <Route
+                    path={route.path}
+                    key={index}
+                    element={
+                      route.state ? (
+                        <PageWrapper state={route.state}>
+                          {route.element}
+                        </PageWrapper>
+                      ) : (
+                        route.element
+                      )
+                    }
+                  />
+                )
+              )}
+            </Route>
+
+            <Route path="/" element={<AdminLayout />}>
+              {adminRoutes.map((route, index) => (
                 <Route
                   path={route.path}
                   key={index}
@@ -60,8 +81,8 @@ function App() {
                     )
                   }
                 />
-              )
-            )}
+              ))}
+            </Route>
           </Route>
 
           {authRoutes.map((route, index) => (

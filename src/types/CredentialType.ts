@@ -11,6 +11,7 @@ export interface CredentialType {
   createdAt?: string;
   updatedAt?: string;
   token?: string;
+  role?: string;
 }
 
 export interface RegisterInitResponseType {

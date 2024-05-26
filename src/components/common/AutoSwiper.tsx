@@ -20,6 +20,7 @@ const AutoSwiper = ({ children }: AutoSwiperProps) => {
       }}
     >
       <Swiper
+        spaceBetween={10}
         slidesPerView="auto"
         grabCursor={true}
         style={{ width: "100%", height: "max-content" }}
