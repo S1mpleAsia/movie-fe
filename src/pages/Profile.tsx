@@ -1,34 +1,27 @@
 import { Box } from "@mui/material";
-import ProfileDetail from "../components/common/ProfileDetail";
-import ProfileHeader from "../components/common/ProfileHeader";
-import UserActivity from "../components/common/UserActivity";
-import backgroundImage from "../assets/profile.jpg";
+import { useState } from "react";
+import { ProfileActivePage } from "../types/profile.type";
+import ProfileLeftbar from "../components/common/ProfileLeftbar";
+import PersonalInfo from "../components/common/PersonalInfo";
+import ChangePassword from "./ChangePassword";
+import uiConfigs from "../configs/ui.config";
+import Container from "../components/common/Container";
 
 const Profile = () => {
+  const [active, setActive] = useState<ProfileActivePage>(
+    ProfileActivePage.PERSONAL
+  );
+
   return (
-    <Box
-      width="100%"
-      height="100%"
-      sx={{
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundRepeat: "no-repeat",
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      <Box paddingTop="6rem" paddingX="9rem">
-        {/* Header */}
-        <ProfileHeader />
-        {/* Header */}
+    <Box sx={{ ...uiConfigs.style.mainContent }}>
+      <Container header="Profile">
+        <Box display="flex" flexDirection="row" gap={2}>
+          <ProfileLeftbar active={active} setActive={setActive} />
 
-        {/* Detail */}
-        <ProfileDetail />
-        {/* Detail */}
-
-        {/* Activify */}
-        <UserActivity />
-        {/* Activify */}
-      </Box>
+          {active === ProfileActivePage.PERSONAL && <PersonalInfo />}
+          {active === ProfileActivePage.PASSWORD && <ChangePassword />}
+        </Box>
+      </Container>
     </Box>
   );
 };

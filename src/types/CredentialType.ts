@@ -5,6 +5,7 @@ export interface CredentialType {
   gender: string;
   password: string;
   fullName: string;
+  phoneNumber?: string;
   imagePath?: string;
   backgroundPath?: string;
   status?: string;

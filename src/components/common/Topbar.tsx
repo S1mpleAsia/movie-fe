@@ -13,7 +13,12 @@ import { cloneElement, useState } from "react";
 import { themeModes } from "../../configs/theme.config";
 import { useDispatch } from "react-redux";
 import { setThemeMode } from "../../redux/features/themeModeSlice";
-import { DarkModeOutlined, Menu, WbSunnyOutlined } from "@mui/icons-material";
+import {
+  BorderBottom,
+  DarkModeOutlined,
+  Menu,
+  WbSunnyOutlined,
+} from "@mui/icons-material";
 import Logo from "./Logo";
 import menuConfigs from "../../configs/menu.config";
 import { Link, useNavigate } from "react-router-dom";
@@ -42,7 +47,7 @@ export const ScrollAppbar = ({ children, window }: ScrollAppbarProps) => {
         ? "primary.contrastText"
         : "text.primary",
       backgroundColor: trigger
-        ? "background.paper"
+        ? "#202020"
         : themeMode === themeModes.dark
         ? "transparent"
         : "background.paper",

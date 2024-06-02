@@ -1,0 +1,43 @@
+import { Box, Typography } from "@mui/material";
+
+type CardComponentProps = {
+  title: string;
+  value: number;
+  extraValue: number;
+};
+
+const CardComponent = ({ title, value, extraValue }: CardComponentProps) => {
+  return (
+    <Box
+      sx={{
+        backgroundColor: "#1e1e1e",
+        padding: "20px 24px",
+        paddingBottom: "28px",
+        paddingRight: "35px",
+        minWidth: "350px",
+        borderRadius: "8px",
+      }}
+    >
+      <Typography fontSize="1.3rem" color="#909198" fontWeight="600">
+        {title}
+      </Typography>
+      <Typography fontSize="1.5rem" fontWeight="700">
+        {value}$
+      </Typography>
+      <Typography
+        marginTop="1rem"
+        fontSize="0.9rem"
+        color="#909198"
+        fontWeight="500"
+      >
+        You have made an extra{" "}
+        <Box component="span" color="#1859b6">
+          {extraValue}
+        </Box>{" "}
+        this year
+      </Typography>
+    </Box>
+  );
+};
+
+export default CardComponent;

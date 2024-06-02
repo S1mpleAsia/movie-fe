@@ -4,6 +4,7 @@ body,
 #root {
   --bg-height: 250px;
   --avatar-width: 10rem;
+  background-color: #121212;
 }
 
 .playbtn .triangle {
@@ -140,15 +141,25 @@ body,
   background-color: #9091ef !important;
 }
 
-.videoPopup.visible {
+.videoPopup.visible,
+.movieViewPopup.visible {
   opacity: 1;
   visibility: visible;
 }
 
-.videoPopup.visible .opacityLayer {
+.videoPopup.visible .opacityLayer,
+.movieViewPopup.visible .opacityLayer {
   opacity: 1;
 }
 
 .videoPopup.visible .videoPlayer {
   transform: scale(1);
+}
+
+.movieViewPopup.visible .movieViewContent {
+  transform: scale(1);
+}
+
+.admin-movie-modal-textarea:focus {
+  border-color: #6062e8 !important;
 }

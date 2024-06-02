@@ -1,5 +1,4 @@
 import { Box } from "@mui/material";
-import React from "react";
 import uiConfigs from "../configs/ui.config";
 import Container from "../components/common/Container";
 import CardList from "../components/common/CardList";
