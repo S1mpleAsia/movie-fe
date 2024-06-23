@@ -48,6 +48,12 @@ const timeUtils = {
 
     return output;
   },
+
+  tableFormatDate: (dateString: string) => {
+    const date = new Date(dateString);
+    const formattedDate = date.toLocaleDateString("en-GB");
+    return formattedDate;
+  },
 };
 
 export default timeUtils;

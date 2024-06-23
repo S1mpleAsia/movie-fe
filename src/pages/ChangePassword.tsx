@@ -6,6 +6,7 @@ import {
   InputAdornment,
   TextField,
   Typography,
+  styled,
 } from "@mui/material";
 import { useFormik } from "formik";
 import React, { useState } from "react";
@@ -17,15 +18,38 @@ import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import { toast } from "react-toastify";
 import VerifyCodeStep from "../components/common/VerifyCodeStep";
+import { userAPI } from "../api/modules/user.api";
+import { ResendOTPRequestType } from "../types/CredentialType";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
+const CustomTextField = styled(TextField)(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    "&:hover fieldset": {
+      borderColor: "rgb(105, 108, 255)", // Hover border color
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "rgb(105, 108, 255)", // Focused border color
+    },
+  },
+
+  "& label.Mui-focused": {
+    color: "rgb(105, 108, 255)",
+  },
+}));
 
 const ChangePassword = () => {
   const { loadingOverlay } = useSelector(
     (state: RootState) => state.loadingOverlay
   );
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { user } = useSelector((state: RootState) => state.user);
 
   const changePwdForm = useFormik({
     initialValues: {
-      email: "",
+      email: user?.email,
       password: "",
       confirmPassword: "",
     },
@@ -40,7 +64,20 @@ const ChangePassword = () => {
     }),
 
     onSubmit: async (values) => {
-      // dispatch(setLoadingOverlay(true));
+      dispatch(setLoadingOverlay(true));
+      if (
+        changePwdForm.values.password !== changePwdForm.values.confirmPassword
+      )
+        toast.error("Password does not match. Please check again");
+      else {
+        sessionStorage.setItem("temp_pwd", changePwdForm.values.password);
+        const request: ResendOTPRequestType = {
+          email: changePwdForm.values.email || "",
+        };
+        await userAPI.resendOTP(request);
+        dispatch(setLoadingOverlay(false));
+        setScreen("verify");
+      }
     },
   });
 
@@ -60,15 +97,6 @@ const ChangePassword = () => {
     event: React.MouseEvent<HTMLButtonElement>
   ) => event.preventDefault();
 
-  const handleContinueClick = async () => {
-    const errors = await changePwdForm.validateForm();
-
-    if (Object.keys(errors).length === 0) setScreen("verify");
-    else {
-      toast.error(Object.values(errors)[0].toString());
-    }
-  };
-
   return (
     <Box
       className="change-password"
@@ -81,8 +109,8 @@ const ChangePassword = () => {
     >
       {screen === "info" && (
         <>
-          <Typography fontSize="1.2rem" fontWeight="500">
-            Personal Information
+          <Typography fontSize="1.5rem" fontWeight="600">
+            Change Password
           </Typography>
 
           <Divider
@@ -106,7 +134,7 @@ const ChangePassword = () => {
             >
               <Box display="flex" flexDirection="column" gap={1}>
                 <Typography>Email</Typography>
-                <TextField
+                <CustomTextField
                   fullWidth
                   className="authText"
                   name="email"
@@ -122,7 +150,7 @@ const ChangePassword = () => {
 
               <Box display="flex" flexDirection="column" gap={1}>
                 <Typography>Password</Typography>
-                <TextField
+                <CustomTextField
                   fullWidth
                   variant="outlined"
                   type={showPassword ? "text" : "password"}
@@ -166,7 +194,7 @@ const ChangePassword = () => {
 
               <Box display="flex" flexDirection="column" gap={1}>
                 <Typography>Confirm password</Typography>
-                <TextField
+                <CustomTextField
                   fullWidth
                   variant="outlined"
                   type={showConfirmPassword ? "text" : "password"}
@@ -224,6 +252,7 @@ const ChangePassword = () => {
                     backgroundColor: "#1e1e1e",
                   },
                 }}
+                onClick={() => navigate("/")}
               >
                 Cancel
               </Button>
@@ -232,6 +261,7 @@ const ChangePassword = () => {
                 // type="submit"
                 size="medium"
                 variant="contained"
+                type="submit"
                 sx={{
                   boxShadow: "rgba(105, 108, 255, 0.4) 0px 2px 4px 0px",
                   backgroundColor: "rgb(96, 98, 232)",
@@ -243,7 +273,6 @@ const ChangePassword = () => {
                   },
                 }}
                 loading={loadingOverlay}
-                onClick={handleContinueClick}
               >
                 Continue
               </LoadingButton>

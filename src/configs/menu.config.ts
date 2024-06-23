@@ -61,12 +61,12 @@ const user: MainProps[] = [
     state: "favourites",
   },
 
-  {
-    display: "reviews",
-    path: "/reviews",
-    icon: RateReviewOutlinedIcon,
-    state: "reviews",
-  },
+  // {
+  //   display: "reviews",
+  //   path: "/reviews",
+  //   icon: RateReviewOutlinedIcon,
+  //   state: "reviews",
+  // },
 
   {
     display: "messages",

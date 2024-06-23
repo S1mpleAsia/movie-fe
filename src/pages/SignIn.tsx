@@ -4,6 +4,7 @@ import {
   InputAdornment,
   TextField,
   Typography,
+  styled,
 } from "@mui/material";
 import Logo from "../components/common/Logo";
 import { useState } from "react";
@@ -21,6 +22,21 @@ import { useSelector } from "react-redux";
 import { userAPI } from "../api/modules/user.api";
 import { GeneralType } from "../types/GeneralType";
 import { CredentialType } from "../types/CredentialType";
+
+const CustomTextField = styled(TextField)(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    "&:hover fieldset": {
+      borderColor: "rgb(105, 108, 255)", // Hover border color
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "rgb(105, 108, 255)", // Focused border color
+    },
+  },
+
+  "& label.Mui-focused": {
+    color: "rgb(105, 108, 255)",
+  },
+}));
 
 const SignIn = () => {
   const dispatch = useDispatch();
@@ -68,7 +84,8 @@ const SignIn = () => {
         setTimeout(() => {
           signinForm.resetForm();
           toast.success("Login success");
-          navigate("/");
+          if (response.data.role === "ADMIN") navigate("/admin/dashboard");
+          else navigate("/");
           dispatch(setLoadingOverlay(false));
         }, 1500);
       }
@@ -144,7 +161,7 @@ const SignIn = () => {
               autoComplete="off"
               onSubmit={signinForm.handleSubmit}
             >
-              <TextField
+              <CustomTextField
                 fullWidth
                 className="authText"
                 label="Email"
@@ -162,7 +179,7 @@ const SignIn = () => {
                 }}
               />
 
-              <TextField
+              <CustomTextField
                 fullWidth
                 variant="outlined"
                 label="Password"

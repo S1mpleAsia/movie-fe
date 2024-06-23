@@ -187,7 +187,11 @@ const MainChat = ({
           {/* Message Header */}
 
           <Divider
-            sx={{ height: "2px", backgroundColor: "red", marginY: "1rem" }}
+            sx={{
+              height: "2px",
+              backgroundColor: "rgba(105, 108, 255, 0.5)",
+              marginY: "1rem",
+            }}
           />
 
           {/* Message Content */}

@@ -13,6 +13,7 @@ const feedbackEndpoints = {
   getFeedbackList: "feedback/public",
   getFeedbackTotalPage: "feedback/public/page",
   updateFeedback: "feedback/private",
+  getFeedbackSummary: "feedback/private/summary",
 };
 
 export const feedbackAPI = {
@@ -68,6 +69,16 @@ export const feedbackAPI = {
       feedbackEndpoints.updateFeedback,
       request
     );
+
+    return response;
+  }),
+
+  getFeedbackSummary: apiErrorHandling(async (userId: string) => {
+    const response = privateClient.get(feedbackEndpoints.getFeedbackSummary, {
+      params: {
+        userId: userId,
+      },
+    });
 
     return response;
   }),

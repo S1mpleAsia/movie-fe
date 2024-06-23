@@ -16,14 +16,26 @@ const MovieSlide = ({ type }: MovieSlideProps) => {
 
   useEffect(() => {
     const getMovies = async () => {
-      const response: GeneralType<MovieOverviewType[]> = (
-        await movieAPI.getMovieList()
-      ).data;
+      if (type !== "toprated") {
+        const response: GeneralType<MovieOverviewType[]> = (
+          await movieAPI.getMovieList()
+        ).data;
 
-      if (response.status.statusCode !== 200) {
-        toast.error(response.status.message);
+        if (response.status.statusCode !== 200) {
+          toast.error(response.status.message);
+        } else {
+          setMovies(response);
+        }
       } else {
-        setMovies(response);
+        const response: GeneralType<MovieOverviewType[]> = (
+          await movieAPI.getTopratedMovieList()
+        ).data;
+
+        if (response.status.statusCode !== 200)
+          toast.error(response.status.message);
+        else {
+          setMovies(response);
+        }
       }
     };
 

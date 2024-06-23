@@ -6,6 +6,7 @@ const preferenceEndpoint = {
   getPreferenceList: "preference",
   checkPreference: "preference/check",
   togglePreference: "preference",
+  getPreferenceSummary: "preference/summary",
 };
 
 export const preferenceAPI = {
@@ -36,6 +37,19 @@ export const preferenceAPI = {
     const response = privateClient.post(
       preferenceEndpoint.togglePreference,
       request
+    );
+
+    return response;
+  }),
+
+  getPreferenceSummary: apiErrorHandling(async (userId: string) => {
+    const response = privateClient.get(
+      preferenceEndpoint.getPreferenceSummary,
+      {
+        params: {
+          userId: userId,
+        },
+      }
     );
 
     return response;

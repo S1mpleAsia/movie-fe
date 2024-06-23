@@ -2,15 +2,21 @@ import { useEffect, useState } from "react";
 import { Month, Period, WeekDay } from "../../types/time.type";
 import { Box, Button, Typography } from "@mui/material";
 import { BarChart } from "@mui/x-charts";
+import { number } from "yup";
+import { GeneralType } from "../../types/GeneralType";
+import { userAPI } from "../../api/modules/user.api";
+import { toast } from "react-toastify";
 
 const UserChart = () => {
+  const [monthData, setMonthData] = useState<number[]>([]);
+  const [weekData, setWeekData] = useState<number[]>([]);
   const [period, setPeriod] = useState<Period>(Period.Week);
   const [xLabel, setXLabel] = useState<string[]>([]);
 
-  const monthData = [
-    4000, 3000, 2000, 2780, 1890, 2390, 3490, 4200, 5600, 1860, 4100, 3780,
-  ];
-  const weekData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
+  // const monthData = [
+  //   4000, 3000, 2000, 2780, 1890, 2390, 3490, 4200, 5600, 1860, 4100, 3780,
+  // ];
+  // const weekData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
 
   useEffect(() => {
     setXLabel(
@@ -19,8 +25,33 @@ const UserChart = () => {
   }, [period]);
 
   useEffect(() => {
-    console.log(xLabel);
-  }, [xLabel]);
+    const getMonthData = async () => {
+      const response: GeneralType<number[]> = (
+        await userAPI.getUserOverview(Period.Month)
+      ).data;
+
+      if (response.status.statusCode !== 200)
+        toast.error(response.status.message);
+      else {
+        setMonthData(response.data);
+      }
+    };
+
+    const getWeekData = async () => {
+      const response: GeneralType<number[]> = (
+        await userAPI.getUserOverview(Period.Week)
+      ).data;
+
+      if (response.status.statusCode !== 200)
+        toast.error(response.status.message);
+      else {
+        setWeekData(response.data);
+      }
+    };
+
+    getMonthData();
+    getWeekData();
+  }, []);
 
   return (
     <Box flex="1">
@@ -51,7 +82,7 @@ const UserChart = () => {
             series={[
               {
                 data: period === Period.Week ? weekData : monthData,
-                label: "pv",
+                label: "User",
               },
             ]}
             xAxis={[{ scaleType: "band", data: xLabel }]}

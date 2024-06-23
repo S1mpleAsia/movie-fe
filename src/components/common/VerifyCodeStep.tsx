@@ -1,12 +1,19 @@
 import { Box, Typography } from "@mui/material";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { VerifyOTPType } from "../../types/CredentialType";
+import {
+  CredentialType,
+  ResendOTPRequestType,
+  SignInRequestType,
+  VerifyOTPType,
+} from "../../types/CredentialType";
 import { userAPI } from "../../api/modules/user.api";
 import { GeneralType } from "../../types/GeneralType";
 import { useDispatch } from "react-redux";
 import { setLoadingOverlay } from "../../redux/features/loadingOverlaySlice";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 type VerifyCodeStepProps = {
   signupForm: any;
@@ -25,6 +32,7 @@ const VerifyCodeStep = ({ signupForm }: VerifyCodeStepProps) => {
   const [isError, setIsError] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -37,8 +45,13 @@ const VerifyCodeStep = ({ signupForm }: VerifyCodeStepProps) => {
   }, [countdown]);
 
   const handleResendClick = async () => {
+    const request: ResendOTPRequestType = {
+      email: signupForm.values.email,
+    };
+
     console.log("Resending code ...");
     toast.success("Success. Please check your mail");
+    userAPI.resendOTP(request);
     setCountdown(30);
   };
 
@@ -56,11 +69,30 @@ const VerifyCodeStep = ({ signupForm }: VerifyCodeStepProps) => {
     ).data;
 
     if (verifyResponse.status.statusCode !== 200) {
+      if (sessionStorage.getItem("temp_pwd"))
+        sessionStorage.removeItem("temp_pwd");
       toast.error(verifyResponse.status.message);
       setIsError(true);
     } else {
-      toast.success("Register success");
-      navigate("/sign-in");
+      if (sessionStorage.getItem("temp_pwd")) {
+        const request: SignInRequestType = {
+          email: user?.email || "",
+          password: sessionStorage.getItem("temp_pwd") || "",
+        };
+
+        const response: GeneralType<CredentialType> = (
+          await userAPI.changePwd(request)
+        ).data;
+        if (response.status.statusCode !== 200) {
+          toast.error(response.status.message);
+        } else {
+          toast.success("Update password success");
+          navigate("/");
+        }
+      } else {
+        toast.success("Register success");
+        navigate("/sign-in");
+      }
     }
 
     dispatch(setLoadingOverlay(false));

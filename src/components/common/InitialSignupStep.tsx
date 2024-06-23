@@ -1,19 +1,25 @@
-import {
-  Box,
-  IconButton,
-  InputAdornment,
-  TextField,
-  Typography,
-} from "@mui/material";
-import Logo from "./Logo";
+import { IconButton, InputAdornment, TextField, styled } from "@mui/material";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
-import { LoadingButton } from "@mui/lab";
-import { Link } from "react-router-dom";
 import React, { useState } from "react";
 
 type InitialSignupProps = {
   signupForm: any;
 };
+
+const CustomTextField = styled(TextField)(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    "&:hover fieldset": {
+      borderColor: "rgb(105, 108, 255)", // Hover border color
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "rgb(105, 108, 255)", // Focused border color
+    },
+  },
+
+  "& label.Mui-focused": {
+    color: "rgb(105, 108, 255)",
+  },
+}));
 
 const InitialSignupStep = ({ signupForm }: InitialSignupProps) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +34,7 @@ const InitialSignupStep = ({ signupForm }: InitialSignupProps) => {
 
   return (
     <>
-      <TextField
+      <CustomTextField
         fullWidth
         className="authText"
         label="Email"
@@ -45,7 +51,7 @@ const InitialSignupStep = ({ signupForm }: InitialSignupProps) => {
         }}
       />
 
-      <TextField
+      <CustomTextField
         fullWidth
         variant="outlined"
         label="Password"

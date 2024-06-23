@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -11,7 +12,7 @@ import {
 import uiConfigs from "../configs/ui.config";
 import Container from "../components/common/Container";
 import React, { useEffect, useState } from "react";
-import { CredentialType } from "../types/CredentialType";
+import { BannedUserRequestType, CredentialType } from "../types/CredentialType";
 import { GeneralType } from "../types/GeneralType";
 import { userAPI } from "../api/modules/user.api";
 import { useSelector } from "react-redux";
@@ -30,6 +31,9 @@ import { RegionType } from "../types/region.type";
 import { CustomNoRowsOverlay } from "../components/common/CustomNoRowOverlay";
 import BlockIcon from "@mui/icons-material/Block";
 import tagUtils from "../utils/tag.utils";
+import { baseEndpoint, getImage } from "../utils/constant";
+import timeUtils from "../utils/time.utils";
+import { useNavigate } from "react-router-dom";
 
 function regionCellRender(params: GridRenderCellParams<any, string>) {
   const region = regions.find(
@@ -56,7 +60,7 @@ function userInfoCellRender(params: GridRenderCellParams<any, any>) {
     <Box display="flex" alignItems="center" gap={1}>
       <Box
         component="img"
-        src={params.row.imagePath}
+        src={getImage(baseEndpoint, params.row.imagePath || "no-avatar.png")}
         alt="Avatar"
         width="45px"
         height="45px"
@@ -82,9 +86,9 @@ function statusCellRender(params: GridRenderCellParams<any, string>) {
         padding: "2px 6px",
         color: "#fff",
         backgroundColor:
-          params.value === "Active"
+          params.value === "ACT"
             ? "#44B401"
-            : params.value === "Pending"
+            : params.value === "PEN"
             ? "#12a097"
             : "#941d24",
         borderRadius: "8px",
@@ -97,14 +101,22 @@ function statusCellRender(params: GridRenderCellParams<any, string>) {
 }
 
 function BannedUserActionItem({
-  deleteUser,
+  userId,
+  status,
   ...props
-}: GridActionsCellItemProps & { deleteUser: () => void }) {
+}: GridActionsCellItemProps & { userId: string; status: string }) {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <>
-      <GridActionsCellItem {...props} onClick={() => setOpen(true)} />
+      <GridActionsCellItem
+        {...props}
+        onClick={() => {
+          if (status !== "INA") setOpen(true);
+          else toast.error("User account already inactive");
+        }}
+      />
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
@@ -120,9 +132,18 @@ function BannedUserActionItem({
             <DialogActions>
               <Button onClick={() => setOpen(false)}>Cancel</Button>
               <Button
-                onClick={() => {
+                onClick={async () => {
                   setOpen(false);
-                  deleteUser();
+                  const request: BannedUserRequestType = {
+                    id: userId,
+                  };
+                  const response: GeneralType<CredentialType> = (
+                    await userAPI.bannedUser(request)
+                  ).data;
+
+                  if (response.status.statusCode !== 200)
+                    toast.error(response.status.message);
+                  else navigate(0);
                 }}
                 color="warning"
                 autoFocus
@@ -158,10 +179,12 @@ const AdminUserPage = () => {
     },
 
     {
-      field: "age",
-      headerName: "Age",
-      type: "number",
-      width: 110,
+      field: "birthday",
+      headerName: "Birthday",
+      valueGetter: (value) => {
+        return timeUtils.tableFormatDate(value);
+      },
+      width: 200,
     },
 
     {
@@ -190,7 +213,8 @@ const AdminUserPage = () => {
         <BannedUserActionItem
           icon={<BlockIcon />}
           label="Banned"
-          deleteUser={() => {}}
+          userId={params.row.id}
+          status={params.row.status}
           closeMenuOnClick={false}
           sx={{ color: "#c71924" }}
         />,
@@ -200,7 +224,7 @@ const AdminUserPage = () => {
 
   const rows = [
     {
-      id: 1,
+      id: "1",
       email: "duongk65bkhn@gmail.com",
       imagePath: "http://127.0.0.1:9000/movie-system/download.jpg",
       fullName: "John Smith",
@@ -210,7 +234,7 @@ const AdminUserPage = () => {
     },
 
     {
-      id: 2,
+      id: "2",
       email: "duongk65bkhn@gmail.com",
       imagePath: "http://127.0.0.1:9000/movie-system/download.jpg",
       fullName: "Olivia Taylor",
@@ -220,7 +244,7 @@ const AdminUserPage = () => {
     },
 
     {
-      id: 3,
+      id: "3",
       email: "duongk65bkhn@gmail.com",
       imagePath: "http://127.0.0.1:9000/movie-system/download.jpg",
       fullName: "Liam Jackson",
@@ -230,7 +254,7 @@ const AdminUserPage = () => {
     },
 
     {
-      id: 4,
+      id: "4",
       email: "duongk65bkhn@gmail.com",
       imagePath: "http://127.0.0.1:9000/movie-system/download.jpg",
       fullName: "Ava Rodriguez",
@@ -240,7 +264,7 @@ const AdminUserPage = () => {
     },
 
     {
-      id: 5,
+      id: "5",
       email: "duongk65bkhn@gmail.com",
       imagePath: "http://127.0.0.1:9000/movie-system/download.jpg",
       fullName: "Noah Lee",
@@ -249,7 +273,7 @@ const AdminUserPage = () => {
       status: "Active",
     },
     {
-      id: 6,
+      id: "6",
       email: "duongk65bkhn@gmail.com",
       imagePath: "http://127.0.0.1:9000/movie-system/download.jpg",
       fullName: "Sophia Williams",
@@ -258,7 +282,7 @@ const AdminUserPage = () => {
       status: "Active",
     },
     {
-      id: 7,
+      id: "7",
       email: "duongk65bkhn@gmail.com",
       imagePath: "http://127.0.0.1:9000/movie-system/download.jpg",
       fullName: "William Brown",
@@ -267,7 +291,7 @@ const AdminUserPage = () => {
       status: "Active",
     },
     {
-      id: 8,
+      id: "8",
       email: "duongk65bkhn@gmail.com",
       imagePath: "http://127.0.0.1:9000/movie-system/download.jpg",
       fullName: "Mia Miller",
@@ -276,7 +300,7 @@ const AdminUserPage = () => {
       status: "Active",
     },
     {
-      id: 9,
+      id: "9",
       email: "duongk65bkhn@gmail.com",
       imagePath: "http://127.0.0.1:9000/movie-system/download.jpg",
       fullName: "James Davis",
@@ -285,7 +309,7 @@ const AdminUserPage = () => {
       status: "Banned",
     },
     {
-      id: 10,
+      id: "10",
       email: "duongk65bkhn@gmail.com",
       imagePath: "http://127.0.0.1:9000/movie-system/download.jpg",
       fullName: "Charlotte Clark",
@@ -312,10 +336,10 @@ const AdminUserPage = () => {
       }
     };
 
-    // getUserList();
+    getUserList();
   }, []);
 
-  return (
+  return userList ? (
     <Box sx={{ ...uiConfigs.style.mainContent }}>
       <Container header="Manage user">
         <Box width="100%">
@@ -325,7 +349,7 @@ const AdminUserPage = () => {
             disableColumnSelector
             disableDensitySelector
             columns={columns}
-            rows={rows}
+            rows={userList}
             slots={{ noRowsOverlay: CustomNoRowsOverlay, toolbar: GridToolbar }}
             slotProps={{
               toolbar: {
@@ -344,6 +368,17 @@ const AdminUserPage = () => {
           />
         </Box>
       </Container>
+    </Box>
+  ) : (
+    <Box
+      sx={{
+        ...uiConfigs.style.mainContent,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <CircularProgress />
     </Box>
   );
 };

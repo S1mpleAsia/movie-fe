@@ -1,4 +1,12 @@
-import { Box, Button, Divider, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  MenuItem,
+  TextField,
+  Typography,
+  styled,
+} from "@mui/material";
 import { useFormik } from "formik";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
@@ -7,6 +15,35 @@ import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { setLoadingOverlay } from "../../redux/features/loadingOverlaySlice";
 import { LoadingButton } from "@mui/lab";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import regions from "../../assets/region_modified.json";
+import { useNavigate } from "react-router-dom";
+import { userAPI } from "../../api/modules/user.api";
+import {
+  CredentialType,
+  CredentialUpdateRequestType,
+} from "../../types/CredentialType";
+import { GeneralType } from "../../types/GeneralType";
+import { toast } from "react-toastify";
+import { updateInfo } from "../../redux/features/userSlice";
+
+const CustomTextField = styled(TextField)(({ theme }) => ({
+  "& .MuiOutlinedInput-root": {
+    "&:hover fieldset": {
+      borderColor: "rgb(105, 108, 255)", // Hover border color
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "rgb(105, 108, 255)", // Focused border color
+    },
+  },
+
+  "& label.Mui-focused": {
+    color: "rgb(105, 108, 255)",
+  },
+}));
 
 const PersonalInfo = () => {
   const { user } = useSelector((state: RootState) => state.user);
@@ -14,6 +51,7 @@ const PersonalInfo = () => {
     (state: RootState) => state.loadingOverlay
   );
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const personalForm = useFormik({
     initialValues: {
@@ -21,8 +59,9 @@ const PersonalInfo = () => {
       firstName: nameUtils.getFirstName(user?.fullName || ""),
       lastName: nameUtils.getLastName(user?.fullName || ""),
       birthday: user?.birthday,
-      phoneNumber: user?.phoneNumber,
+      gender: user?.gender,
       role: user?.role,
+      region: user?.region,
     },
 
     validationSchema: Yup.object({
@@ -35,6 +74,28 @@ const PersonalInfo = () => {
 
     onSubmit: async (values) => {
       dispatch(setLoadingOverlay(true));
+      const requestBody: CredentialUpdateRequestType = {
+        id: user?.id || "0",
+        fullName:
+          personalForm.values.firstName + " " + personalForm.values.lastName,
+        birthday: personalForm.values.birthday,
+        gender: personalForm.values.gender,
+        region: personalForm.values.region,
+      };
+
+      const response: GeneralType<CredentialType> = (
+        await userAPI.updateInfo(requestBody)
+      ).data;
+
+      console.log(response);
+      dispatch(setLoadingOverlay(false));
+
+      if (response.status.statusCode !== 200) {
+        toast.error(response.status.message);
+      } else {
+        toast.success("Update user information success");
+        dispatch(updateInfo(response.data));
+      }
     },
   });
 
@@ -48,7 +109,7 @@ const PersonalInfo = () => {
         flexGrow: 1,
       }}
     >
-      <Typography fontSize="1.2rem" fontWeight="500">
+      <Typography fontSize="1.5rem" fontWeight="600">
         Personal Information
       </Typography>
 
@@ -74,7 +135,7 @@ const PersonalInfo = () => {
           <Box sx={{ flex: 1 }} display="flex" flexDirection="column" gap={1.5}>
             <Box display="flex" flexDirection="column" gap={1}>
               <Typography>First Name</Typography>
-              <TextField
+              <CustomTextField
                 fullWidth
                 className="authText"
                 name="firstName"
@@ -97,8 +158,8 @@ const PersonalInfo = () => {
             </Box>
 
             <Box display="flex" flexDirection="column" gap={1}>
-              <Typography>Email</Typography>
-              <TextField
+              <Typography>Email Address</Typography>
+              <CustomTextField
                 fullWidth
                 className="authText"
                 name="email"
@@ -113,34 +174,53 @@ const PersonalInfo = () => {
             </Box>
 
             <Box display="flex" flexDirection="column" gap={1}>
-              <Typography>Phone Number</Typography>
-              <TextField
+              <Typography>Gender</Typography>
+              <CustomTextField
+                select
                 fullWidth
-                className="authText"
-                name="phoneNumber"
-                type="text"
-                value={personalForm.values.phoneNumber}
+                className="genderText"
+                placeholder="Gender"
+                name="gender"
+                id="gender-select"
+                size="small"
+                value={personalForm.values.gender}
                 onChange={personalForm.handleChange}
                 helperText={
-                  personalForm.touched.phoneNumber &&
-                  personalForm.errors.phoneNumber
+                  personalForm.touched.gender && personalForm.errors.gender
                 }
                 error={
-                  personalForm.touched.phoneNumber &&
-                  personalForm.errors.phoneNumber !== undefined
+                  personalForm.touched.gender &&
+                  personalForm.errors.gender !== undefined
                 }
-                size="small"
                 sx={{
                   marginBottom: "1rem",
+                  ".MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#6062e8",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#6062e8",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#6062e8",
+                  },
+                  ".MuiSvgIcon-root ": {
+                    fill: "white !important",
+                  },
                 }}
-              />
+              >
+                <MenuItem value="male" color="#6062e8">
+                  Male
+                </MenuItem>
+                <MenuItem value="female">Female</MenuItem>
+                <MenuItem value="other">Other</MenuItem>
+              </CustomTextField>
             </Box>
           </Box>
 
           <Box sx={{ flex: 1 }} display="flex" flexDirection="column" gap={1.5}>
             <Box display="flex" flexDirection="column" gap={1}>
               <Typography>Last Name</Typography>
-              <TextField
+              <CustomTextField
                 fullWidth
                 className="authText"
                 name="lastName"
@@ -163,42 +243,92 @@ const PersonalInfo = () => {
 
             <Box display="flex" flexDirection="column" gap={1}>
               <Typography>Date of birth</Typography>
-              <TextField
-                fullWidth
-                className="authText"
-                name="birthday"
-                type="text"
-                value={personalForm.values.birthday}
-                size="small"
-                sx={{
-                  marginBottom: "1rem",
-                  backgroundColor: "#303030",
-                }}
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  sx={{
+                    marginBottom: "1rem",
+                    width: "100%",
+                    ".MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#6062e8",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#6062e8",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#6062e8",
+                    },
+                    ".MuiSvgIcon-root ": {
+                      fill: "white !important",
+                    },
+                  }}
+                  name="birthday"
+                  onChange={(value: any) =>
+                    personalForm.setFieldValue(
+                      "birthday",
+                      dayjs(value).format("YYYY-MM-DD"),
+                      true
+                    )
+                  }
+                  defaultValue={dayjs(user?.birthday)}
+                  slotProps={{
+                    textField: {
+                      variant: "outlined",
+                      size: "small",
+                      error:
+                        personalForm.touched.birthday &&
+                        personalForm.errors.birthday !== undefined,
+                      helperText:
+                        personalForm.touched.birthday &&
+                        personalForm.errors.birthday,
+                    },
+                  }}
+                />
+              </LocalizationProvider>
             </Box>
 
             <Box display="flex" flexDirection="column" gap={1}>
-              <Typography>Phone Number</Typography>
-              <TextField
+              <Typography>Region</Typography>
+              <CustomTextField
+                select
                 fullWidth
-                className="authText"
-                name="phoneNumber"
-                type="text"
-                value={personalForm.values.phoneNumber}
+                className="genderText"
+                placeholder="Region"
+                name="region"
+                id="region-select"
+                value={personalForm.values.region}
                 onChange={personalForm.handleChange}
-                helperText={
-                  personalForm.touched.phoneNumber &&
-                  personalForm.errors.phoneNumber
-                }
-                error={
-                  personalForm.touched.phoneNumber &&
-                  personalForm.errors.phoneNumber !== undefined
-                }
                 size="small"
                 sx={{
                   marginBottom: "1rem",
+                  ".MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#6062e8",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#6062e8",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#6062e8",
+                  },
+                  ".MuiSvgIcon-root ": {
+                    fill: "white !important",
+                  },
                 }}
-              />
+              >
+                {regions.map((region) => (
+                  <MenuItem value={region.name.common}>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Box
+                        component="img"
+                        src={region.flags.svg}
+                        alt={region.flags.alt}
+                        width="50px"
+                        marginRight={1}
+                      />
+                      <Typography>{region.name.common}</Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
+              </CustomTextField>
             </Box>
           </Box>
         </Box>
@@ -218,6 +348,7 @@ const PersonalInfo = () => {
                 backgroundColor: "#1e1e1e",
               },
             }}
+            onClick={() => navigate("/")}
           >
             Cancel
           </Button>

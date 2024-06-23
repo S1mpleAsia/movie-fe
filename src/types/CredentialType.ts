@@ -1,18 +1,17 @@
 export interface CredentialType {
   id?: string;
   email: string;
-  birthday: string;
+  birthday?: string;
   gender: string;
   password: string;
   fullName: string;
-  phoneNumber?: string;
   imagePath?: string;
-  backgroundPath?: string;
   status?: string;
   createdAt?: string;
   updatedAt?: string;
   token?: string;
   role?: string;
+  region?: string;
 }
 
 export interface RegisterInitResponseType {
@@ -28,4 +27,30 @@ export interface VerifyOTPType {
 export interface SignInRequestType {
   email: string;
   password: string;
+}
+
+export interface BannedUserRequestType {
+  id: string;
+}
+
+export interface CheckExistedCredentialType {
+  email: string;
+  existed: boolean;
+}
+
+export interface ResendOTPRequestType {
+  email: string;
+}
+
+export interface CredentialUpdateRequestType {
+  id: string;
+  fullName?: string;
+  birthday?: string;
+  gender?: string;
+  region?: string;
+}
+
+export interface AvatarUpdateRequest {
+  id: string;
+  path: string;
 }

@@ -20,8 +20,9 @@ const nameUtils = {
       return ""; // Return empty string if no parts
     }
 
+    nameParts.shift();
     // Return the last part as the last name
-    return nameParts[nameParts.length - 1];
+    return nameParts.join(" ");
   },
 };
 

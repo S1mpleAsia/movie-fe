@@ -33,6 +33,8 @@ import {
 import timeUtils from "../utils/time.utils";
 import TrailerPopup from "../components/common/TrailerPopup";
 import SharingPopup from "../components/common/SharingPopup";
+import { PaymentReponseWithCredential } from "../types/PaymentType";
+import { paymentAPI } from "../api/modules/payment.api";
 
 const MovieDetail = () => {
   const { movieId } = useParams();
@@ -54,9 +56,9 @@ const MovieDetail = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    const getMovieList = async () => {
+    const getMovieList = async (query: string) => {
       const response: GeneralType<MovieOverviewType[]> = (
-        await movieAPI.getMovieList()
+        await movieAPI.getRecommendMovieList(query)
       ).data;
 
       if (response.status.statusCode !== 200) {
@@ -94,7 +96,13 @@ const MovieDetail = () => {
         dispatch(setGlobalLoading(false));
       }
 
-      getMovieList();
+      const query =
+        response.data.title +
+        " " +
+        response.data.overview +
+        " " +
+        response.data.genreList.map((genre) => genre.name).join(" ");
+      getMovieList(query);
       checkFavourite();
     };
 
@@ -130,6 +138,16 @@ const MovieDetail = () => {
 
   const onSharingClick = () => {
     setShowSharing(true);
+  };
+
+  const handleOnWatchMovie = async () => {
+    const response: GeneralType<PaymentReponseWithCredential> = (
+      await paymentAPI.getUserPayment(user?.id || "")
+    ).data;
+
+    if (response.status.statusCode === 200 && response.data.purchase) {
+      navigate(`/movie/watch/${movieId}`);
+    } else navigate(`/subscription`);
   };
 
   return movie ? (
@@ -296,7 +314,7 @@ const MovieDetail = () => {
                     sx={{ width: "max-content" }}
                     size="large"
                     startIcon={<PlayArrowIcon />}
-                    onClick={() => navigate(`/movie/watch/${movieId}`)}
+                    onClick={handleOnWatchMovie}
                   >
                     Watch now
                   </Button>

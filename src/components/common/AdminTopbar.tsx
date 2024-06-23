@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Sidebar from "./Sidebar";
 import { ScrollAppbar } from "./Topbar";
 import { AppBar, Box, Button, IconButton, Stack, Toolbar } from "@mui/material";
 import { Menu } from "@mui/icons-material";
@@ -9,12 +8,15 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { Link, useNavigate } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/features/userSlice";
 
 const AdminTopbar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { appState } = useSelector((state: RootState) => state.appState);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const setSidebarFunc = (open: boolean) => setSidebarOpen(open);
 
@@ -75,8 +77,14 @@ const AdminTopbar = () => {
 
             {/* User menu */}
             <Stack spacing={3} direction="row" alignItems="center">
-              <Button variant="contained" onClick={() => navigate("/")}>
-                User Client
+              <Button
+                variant="contained"
+                onClick={() => {
+                  dispatch(setUser(null));
+                  navigate("/sign-in");
+                }}
+              >
+                Log out
               </Button>
             </Stack>
             {/* User menu */}

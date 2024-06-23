@@ -18,7 +18,7 @@ import menuConfigs from "../../configs/menu.config";
 import { Link, useNavigate } from "react-router-dom";
 import { setUser } from "../../redux/features/userSlice";
 import { LogoutOutlined } from "@mui/icons-material";
-import { getRandomColor, getShortenName } from "../../utils/preference";
+import { baseEndpoint, getImage } from "../../utils/constant";
 
 const UserMenu = () => {
   const { user } = useSelector((state: RootState) => state.user);
@@ -42,13 +42,11 @@ const UserMenu = () => {
             >
               <Avatar
                 sx={{
-                  width: 40,
-                  height: 40,
-                  backgroundColor: `${getRandomColor()}`,
+                  width: 50,
+                  height: 50,
                 }}
-              >
-                {getShortenName(user.fullName)}
-              </Avatar>
+                src={getImage(baseEndpoint, user?.imagePath || "no-avatar.png")}
+              />
             </IconButton>
           </Tooltip>
 

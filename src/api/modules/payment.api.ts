@@ -1,10 +1,14 @@
 import { CheckoutRequest } from "../../types/PaymentType";
+import { Period } from "../../types/time.type";
 import privateClient from "../client/private.client";
+import publicClient from "../client/public.client";
 import { apiErrorHandling } from "../configs/apiErrorHandling";
 
 const paymentEndpoints = {
   checkoutPayment: "payment/checkout",
   getUserPayment: "payment",
+  getRevenueOverview: "payment/overview",
+  getPaymentSummary: "payment/summary",
 };
 
 export const paymentAPI = {
@@ -23,6 +27,22 @@ export const paymentAPI = {
         userId: userId,
       },
     });
+
+    return response;
+  }),
+
+  getRevenueOverview: apiErrorHandling(async (period: Period) => {
+    const response = privateClient.get(paymentEndpoints.getRevenueOverview, {
+      params: {
+        period: period,
+      },
+    });
+
+    return response;
+  }),
+
+  getPaymentSummary: apiErrorHandling(async () => {
+    const response = publicClient.get(paymentEndpoints.getPaymentSummary);
 
     return response;
   }),

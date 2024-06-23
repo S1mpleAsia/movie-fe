@@ -42,9 +42,20 @@ export const userSlice = createSlice({
     addFavourite: (state, action: PayloadAction<MovieOverviewType>) => {
       state.listFavourites = [action.payload, ...state.listFavourites];
     },
+
+    updateInfo: (state, action: PayloadAction<Partial<CredentialType>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
+    },
   },
 });
 
-export const { setUser, setListFavourites, addFavourite, removeFavourite } =
-  userSlice.actions;
+export const {
+  setUser,
+  setListFavourites,
+  addFavourite,
+  removeFavourite,
+  updateInfo,
+} = userSlice.actions;
 export default userSlice.reducer;

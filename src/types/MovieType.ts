@@ -46,3 +46,48 @@ export interface VideoType {
   site: string;
   videoType: string;
 }
+
+export interface MovieSearchRequestType {
+  query: string;
+  limit: number;
+  filter: number[];
+  order: OrderType;
+}
+
+interface OrderType {
+  label: string;
+  value: string;
+}
+
+export interface AddMovieRequest {
+  title?: string;
+  overview?: string;
+  runtime?: string;
+  genres?: string[];
+  language?: string;
+  status?: "Released";
+  releaseDate?: string;
+  posterPath: string | null;
+  videoPath: string | null;
+  backdropPath: string | null;
+}
+
+export interface MovieModifiedResponse {
+  id?: number;
+  title?: string;
+  overview?: string;
+  runtime?: string;
+  genres?: string[];
+  language?: string;
+  status?: "Released";
+  releaseDate?: string;
+  posterPath: string | null;
+  videoPath: string | null;
+  backdropPath: string | null;
+  videoSite?: string;
+}
+
+export interface LockMovieRequest {
+  movieId?: number;
+  status: string;
+}

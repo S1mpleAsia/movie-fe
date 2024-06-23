@@ -46,7 +46,7 @@ const ChatPage = () => {
           sx={{
             minHeight: "100vh",
             width: "2px",
-            backgroundColor: "red",
+            backgroundColor: "rgba(105, 108, 255, 0.5)",
             marginX: "10px",
           }}
         />

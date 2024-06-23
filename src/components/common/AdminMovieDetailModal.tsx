@@ -18,8 +18,8 @@ import {
 } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  AddMovieRequest,
   GenreType,
+  MovieModifiedResponse,
   MovieOverviewType,
 } from "../../types/MovieType";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -30,7 +30,12 @@ import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import { definedLanguage } from "../../assets/language";
 import { storageAPI } from "../../api/modules/upload.api";
-import { baseEndpoint, getImage, storageImage } from "../../utils/constant";
+import {
+  baseEndpoint,
+  getImage,
+  storageImage,
+  videoPath,
+} from "../../utils/constant";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ReactPlayer from "react-player";
 import { useNavigate } from "react-router-dom";
@@ -75,9 +80,9 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const AdminMovieModal = ({ open, setOpen }: AdminMovieModalProps) => {
+const AdminMovieDetailModal = ({ open, setOpen }: AdminMovieModalProps) => {
   const theme = useTheme();
-  const [movie, setMovie] = useState<AddMovieRequest>({
+  const [movie, setMovie] = useState<MovieModifiedResponse>({
     status: "Released",
     posterPath: null,
     backdropPath: null,
@@ -183,18 +188,11 @@ const AdminMovieModal = ({ open, setOpen }: AdminMovieModalProps) => {
   };
 
   const handleSubmit = async () => {
-    const response: GeneralType<MovieOverviewType> = (
-      await movieAPI.saveMovie(movie)
-    ).data;
+    const response: GeneralType<any> = (await movieAPI.updateMovie(movie)).data;
 
     if (response.status.statusCode !== 200) toast.error("Create movie failed");
     else {
       toast.success("Create movie successfully");
-      setMovie((movie) => ({
-        posterPath: null,
-        backdropPath: null,
-        videoPath: null,
-      }));
       setOpen(false);
       navigate(0);
     }
@@ -216,8 +214,24 @@ const AdminMovieModal = ({ open, setOpen }: AdminMovieModalProps) => {
   }, []);
 
   useEffect(() => {
-    console.log(movie);
-  }, [movie]);
+    const getBasicInfo = async () => {
+      const response: GeneralType<MovieModifiedResponse> = (
+        await movieAPI.getBasicInfo(
+          parseInt(sessionStorage.getItem("tempId") || "0")
+        )
+      ).data;
+
+      if (response.status.statusCode !== 200)
+        toast.error("Can not get movie information");
+      else {
+        setMovie(response.data);
+        setSelectedGenres(response.data.genres || []);
+        setLanguage(response.data.language || "en");
+      }
+    };
+
+    getBasicInfo();
+  }, [sessionStorage.getItem("tempId")]);
 
   return (
     <Box
@@ -383,6 +397,8 @@ const AdminMovieModal = ({ open, setOpen }: AdminMovieModalProps) => {
 
               <CustomTextField
                 label="Title"
+                focused
+                value={movie.title}
                 onChange={(e) => {
                   setMovie((movie) => ({ ...movie, title: e.target.value }));
                 }}
@@ -392,6 +408,7 @@ const AdminMovieModal = ({ open, setOpen }: AdminMovieModalProps) => {
                 minRows={5}
                 placeholder="Movie overview"
                 className="admin-movie-modal-textarea"
+                value={movie.overview}
                 onChange={(e) => {
                   setMovie((movie) => ({ ...movie, overview: e.target.value }));
                 }}
@@ -422,6 +439,7 @@ const AdminMovieModal = ({ open, setOpen }: AdminMovieModalProps) => {
                 </InputLabel>
                 <OutlinedInput
                   id="movie-runtime"
+                  value={movie.runtime}
                   startAdornment={
                     <InputAdornment position="start">(min)</InputAdornment>
                   }
@@ -520,26 +538,12 @@ const AdminMovieModal = ({ open, setOpen }: AdminMovieModalProps) => {
                   zIndex: 20000,
                 }}
               >
-                <InputLabel
-                  id="movie-language-label"
-                  sx={{
-                    color: "rgba(255, 255, 255, 0.5)",
-                    "&.Mui-focused": {
-                      color: "rgb(105, 108, 255)",
-                    },
-                  }}
-                >
-                  Language
-                </InputLabel>
+                <InputLabel id="movie-language-label">Language</InputLabel>
                 <Select
                   labelId="movie-language-label"
                   id="movie-language-select"
                   value={language}
                   label="language"
-                  sx={{
-                    "&.MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline":
-                      { borderColor: "rgb(105, 108, 255)" },
-                  }}
                   onChange={handleChangeLanguage}
                 >
                   {definedLanguage.map((item) => (
@@ -575,7 +579,7 @@ const AdminMovieModal = ({ open, setOpen }: AdminMovieModalProps) => {
               gap={3}
               padding="0 20px 10px 20px"
             >
-              <CustomTextField
+              <TextField
                 defaultValue="Released"
                 label="Status"
                 disabled
@@ -605,6 +609,7 @@ const AdminMovieModal = ({ open, setOpen }: AdminMovieModalProps) => {
                         color: "rgb(105, 108, 255)",
                       },
                     }}
+                    value={dayjs(movie.releaseDate)}
                     onChange={(value) =>
                       setMovie((movie) => ({
                         ...movie,
@@ -634,13 +639,17 @@ const AdminMovieModal = ({ open, setOpen }: AdminMovieModalProps) => {
                   }}
                 >
                   {movie.videoPath && (
-                    <Box position="relative">
+                    <Box position="relative" width="100%" height="auto">
                       <ReactPlayer
                         controls
                         onReady={() => true}
                         width="100%"
                         height="100%"
-                        url={getImage(baseEndpoint, movie.videoPath)}
+                        url={
+                          movie.videoSite === "system"
+                            ? getImage(baseEndpoint, movie.videoPath)
+                            : videoPath(movie.videoPath)
+                        }
                       />
                       <CancelIcon
                         sx={{
@@ -814,4 +823,4 @@ const AdminMovieModal = ({ open, setOpen }: AdminMovieModalProps) => {
   );
 };
 
-export default AdminMovieModal;
+export default AdminMovieDetailModal;

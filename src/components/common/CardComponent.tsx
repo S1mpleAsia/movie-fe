@@ -22,20 +22,58 @@ const CardComponent = ({ title, value, extraValue }: CardComponentProps) => {
         {title}
       </Typography>
       <Typography fontSize="1.5rem" fontWeight="700">
-        {value}$
+        {value}{" "}
+        {title === "Total Revenues"
+          ? "$"
+          : title === "Total Movies"
+          ? "movies"
+          : "users"}
       </Typography>
-      <Typography
-        marginTop="1rem"
-        fontSize="0.9rem"
-        color="#909198"
-        fontWeight="500"
-      >
-        You have made an extra{" "}
-        <Box component="span" color="#1859b6">
-          {extraValue}
-        </Box>{" "}
-        this year
-      </Typography>
+
+      {title === "Total Revenues" && (
+        <Typography
+          marginTop="1rem"
+          fontSize="0.9rem"
+          color="#909198"
+          fontWeight="500"
+        >
+          You have made an extra{" "}
+          <Box component="span" color="#1859b6">
+            {extraValue}$
+          </Box>{" "}
+          this year
+        </Typography>
+      )}
+
+      {title === "Total Movies" && (
+        <Typography
+          marginTop="1rem"
+          fontSize="0.9rem"
+          color="#909198"
+          fontWeight="500"
+        >
+          You have total{" "}
+          <Box component="span" color="#1859b6">
+            {extraValue}
+          </Box>{" "}
+          movies in the system
+        </Typography>
+      )}
+
+      {title === "Total User" && (
+        <Typography
+          marginTop="1rem"
+          fontSize="0.9rem"
+          color="#909198"
+          fontWeight="500"
+        >
+          You have total{" "}
+          <Box component="span" color="#1859b6">
+            {extraValue}
+          </Box>{" "}
+          user register this year
+        </Typography>
+      )}
     </Box>
   );
 };

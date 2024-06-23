@@ -2,16 +2,21 @@ import { Box, Button, Typography } from "@mui/material";
 import { LineChart } from "@mui/x-charts";
 import { useEffect, useState } from "react";
 import { Month, Period, WeekDay } from "../../types/time.type";
+import { GeneralType } from "../../types/GeneralType";
+import { paymentAPI } from "../../api/modules/payment.api";
+import { toast } from "react-toastify";
 
 const RevenueChart = () => {
+  const [monthData, setMonthData] = useState<number[]>([]);
+  const [weekData, setWeekData] = useState<number[]>([]);
   const [period, setPreiod] = useState<Period>(Period.Week);
 
   const [xLabel, setXLabel] = useState<string[]>([]);
 
-  const monthData = [
-    4000, 3000, 2000, 2780, 1890, 2390, 3490, 4200, 5600, 1860, 4100, 3780,
-  ];
-  const weekData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
+  // const monthData = [
+  //   4000, 3000, 2000, 2780, 1890, 2390, 3490, 4200, 5600, 1860, 4100, 3780,
+  // ];
+  // const weekData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
 
   useEffect(() => {
     setXLabel(
@@ -20,8 +25,33 @@ const RevenueChart = () => {
   }, [period]);
 
   useEffect(() => {
-    console.log(xLabel);
-  }, [xLabel]);
+    const getMonthData = async () => {
+      const response: GeneralType<number[]> = (
+        await paymentAPI.getRevenueOverview(Period.Month)
+      ).data;
+
+      if (response.status.statusCode !== 200)
+        toast.error(response.status.message);
+      else {
+        setMonthData(response.data);
+      }
+    };
+
+    const getWeekData = async () => {
+      const response: GeneralType<number[]> = (
+        await paymentAPI.getRevenueOverview(Period.Week)
+      ).data;
+
+      if (response.status.statusCode !== 200)
+        toast.error(response.status.message);
+      else {
+        setWeekData(response.data);
+      }
+    };
+
+    getMonthData();
+    getWeekData();
+  }, []);
 
   return (
     <Box width={800}>
@@ -52,7 +82,7 @@ const RevenueChart = () => {
             series={[
               {
                 data: period === Period.Week ? weekData : monthData,
-                label: "pv",
+                label: "Revenue",
                 area: true,
                 showMark: false,
               },

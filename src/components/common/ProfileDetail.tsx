@@ -35,7 +35,7 @@ const ProfileDetail = () => {
       <Box marginTop="40px">
         <Stack direction="row" gap={2} alignItems="center">
           <Typography variant="h4" fontWeight="700" fontSize="2.5rem">
-            {user?.fullName || "Vu Tung Duong"}
+            {user?.fullName || "Anonymous User"}
           </Typography>
 
           <Chip

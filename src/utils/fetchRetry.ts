@@ -3,7 +3,7 @@ import { GeneralType } from "../types/GeneralType";
 export default async function fetchRetry<T>(
   apiCall: () => Promise<GeneralType<T>>,
   condition: (response: GeneralType<T>) => boolean,
-  maxRetries: number = 3,
+  maxRetries: number = 5,
   retryDelay: number = 1000
 ): Promise<GeneralType<T>> {
   let retries = 0;

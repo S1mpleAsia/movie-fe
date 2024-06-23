@@ -15,6 +15,7 @@ import { RootState } from "../redux/store";
 import { setLoadingOverlay } from "../redux/features/loadingOverlaySlice";
 import { userAPI } from "../api/modules/user.api";
 import {
+  CheckExistedCredentialType,
   CredentialType,
   RegisterInitResponseType,
 } from "../types/CredentialType";
@@ -41,6 +42,7 @@ const SignUp = () => {
     fullName: "",
     birthday: "",
     gender: "",
+    region: "",
   };
 
   const signupForm = useFormik({
@@ -56,16 +58,35 @@ const SignUp = () => {
 
     onSubmit: async (values) => {
       if (activeStep === 0) {
-        setActiveStep((step) => step + 1);
+        const response: GeneralType<CheckExistedCredentialType> = (
+          await userAPI.checkExisted(signupForm.values)
+        ).data;
+
+        if (response.data.existed) {
+          toast.error("User with this email already existed");
+        } else {
+          setActiveStep((step) => step + 1);
+        }
       } else if (activeStep === 1) {
+        if (
+          signupForm.values.fullName.length === 0 ||
+          /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(
+            signupForm.values.fullName
+          )
+        ) {
+          toast.error(
+            "Fullname must not empty and do not have special characters"
+          );
+
+          return;
+        }
+
         dispatch(setLoadingOverlay(true));
         console.log("--- Start init register ---");
 
         const response: GeneralType<RegisterInitResponseType> = (
           await userAPI.initRegister(signupForm.values)
         ).data;
-
-        console.log(response.data.orderId);
 
         if (response.status.statusCode !== 200)
           toast.error(response.status.message);

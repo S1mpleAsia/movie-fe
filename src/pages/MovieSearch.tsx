@@ -1,19 +1,18 @@
-import { Autocomplete, Box, Stack, TextField } from "@mui/material";
+import { Box, Stack, TextField } from "@mui/material";
 import uiConfigs from "../configs/ui.config";
 import Container from "../components/common/Container";
 import { useCallback, useEffect, useState } from "react";
-import { GenreType, MovieOverviewType } from "../types/MovieType";
+import {
+  GenreType,
+  MovieOverviewType,
+  MovieSearchRequestType,
+} from "../types/MovieType";
 import { GeneralType } from "../types/GeneralType";
 import { movieAPI } from "../api/modules/movie.api";
 import { toast } from "react-toastify";
-import Select, { ActionMeta, MultiValue, SingleValue } from "react-select";
+import Select, { ActionMeta, SingleValue } from "react-select";
 import MovieGrid from "../components/common/MovieGrid";
 import { LoadingButton } from "@mui/lab";
-
-type sortbyProp = {
-  value: string;
-  label: string;
-};
 
 type FilterProps = {
   sort_by: any;
@@ -22,10 +21,6 @@ type FilterProps = {
 
 let timer: any;
 const timeout = 500;
-let filter: FilterProps = {
-  sort_by: null,
-  with_genres: null,
-};
 
 const sortbyData: any = [
   { value: "popularity.desc", label: "Popularity Descending" },
@@ -33,11 +28,11 @@ const sortbyData: any = [
   { value: "vote_average.desc", label: "Rating Descending" },
   { value: "vote_average.asc", label: "Rating Ascending" },
   {
-    value: "primary_release_date.desc",
+    value: "release_date.desc",
     label: "Release Date Descending",
   },
-  { value: "primary_release_date.asc", label: "Release Date Ascending" },
-  { value: "original_title.asc", label: "Title (A-Z)" },
+  { value: "release_date.asc", label: "Release Date Ascending" },
+  { value: "title.asc", label: "Title (A-Z)" },
 ];
 
 const MovieSearch = () => {
@@ -51,6 +46,10 @@ const MovieSearch = () => {
     []
   );
   const [sortby, setSortby] = useState<any>();
+  const [filter, setFilter] = useState<FilterProps>({
+    sort_by: null,
+    with_genres: null,
+  });
 
   const onLoadMore = () => setPage(page + 1);
 
@@ -58,10 +57,26 @@ const MovieSearch = () => {
     setOnSearch(true);
 
     // Search API
-    console.log(query, page);
+    const request: MovieSearchRequestType = {
+      query: query,
+      limit: 10,
+      filter: filter.with_genres,
+      order: filter.sort_by || {
+        label: "id.asc",
+        value: "id.asc",
+      },
+    };
+
+    const response: GeneralType<MovieOverviewType[]> = (
+      await movieAPI.getMovieSearch(request)
+    ).data;
+
+    if (response.status.statusCode !== 200)
+      toast.error(response.status.message);
+    else setMovies(response.data);
 
     setOnSearch(false);
-  }, [query, page]);
+  }, [query]);
 
   const onQueryChange = (e: React.ChangeEvent<any>) => {
     const newQuery = e.target.value;
@@ -80,9 +95,9 @@ const MovieSearch = () => {
 
     if (action.action !== "clear") {
       let genreId = selectedItems.map((genre) => genre.id);
-      filter.with_genres = genreId;
+      setFilter((filter) => ({ ...filter, with_genres: genreId }));
     } else {
-      filter.with_genres = null;
+      setFilter((filter) => ({ ...filter, with_genres: null }));
     }
   };
 
@@ -93,15 +108,14 @@ const MovieSearch = () => {
     setSortby(selectedItems);
 
     if (action.name !== "clear") {
-      filter.sort_by = selectedItems;
+      setFilter((filter) => ({ ...filter, sort_by: selectedItems }));
     } else {
-      filter.sort_by = selectedItems;
+      setFilter((filter) => ({ ...filter, sort_by: null }));
     }
   };
 
   useEffect(() => {
     const getGenres = async () => {
-      setOnSearch(true);
       const response: GeneralType<GenreType[]> = (await movieAPI.getGenreList())
         .data;
 
@@ -111,7 +125,6 @@ const MovieSearch = () => {
         setGenres(response.data);
         getMovieList();
       }
-      setOnSearch(false);
     };
 
     const getMovieList = async () => {
@@ -130,11 +143,32 @@ const MovieSearch = () => {
   }, []);
 
   useEffect(() => {
-    if (query.trim.length === 0) {
-      setMovies([]);
-      setPage(1);
-    } else search();
-  }, [search, query, page]);
+    search();
+  }, [query]);
+
+  useEffect(() => {
+    const searchOnFilterChange = async () => {
+      const request: MovieSearchRequestType = {
+        query: query,
+        limit: 10,
+        filter: filter.with_genres,
+        order: filter.sort_by || {
+          label: "id.asc",
+          value: "id.asc",
+        },
+      };
+
+      const response: GeneralType<MovieOverviewType[]> = (
+        await movieAPI.getMovieSearch(request)
+      ).data;
+
+      if (response.status.statusCode !== 200)
+        toast.error(response.status.message);
+      else setMovies(response.data);
+    };
+    console.log(filter);
+    searchOnFilterChange();
+  }, [filter]);
 
   return (
     <Box sx={{ ...uiConfigs.style.mainContent }}>
@@ -162,6 +196,7 @@ const MovieSearch = () => {
               label="Search"
               name="search"
               type="search"
+              size="small"
               onChange={onQueryChange}
             />
 

@@ -2,6 +2,8 @@ import { Box, Stack, Typography } from "@mui/material";
 import { UserMessageType } from "../../types/MessageType";
 import { useDispatch } from "react-redux";
 import { setChatPartnerId } from "../../redux/features/chatPartnerSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 type InboxBoxProps = {
   message: UserMessageType;
@@ -10,6 +12,9 @@ type InboxBoxProps = {
 
 const InboxBox = ({ message, setDefaultScreen }: InboxBoxProps) => {
   const dispatch = useDispatch();
+  const { chatPartnerId } = useSelector(
+    (state: RootState) => state.chatPartnerId
+  );
 
   return (
     <Box
@@ -22,8 +27,11 @@ const InboxBox = ({ message, setDefaultScreen }: InboxBoxProps) => {
         borderRadius: "10px",
         cursor: "pointer",
         "&:hover": {
-          backgroundColor: "red",
+          backgroundColor:
+            chatPartnerId === message.partnerId ? "#3f405c" : "#6f7071",
         },
+        backgroundColor:
+          chatPartnerId === message.partnerId ? "#3f405c" : "transparent",
       }}
       onClick={() => {
         setDefaultScreen(false);
