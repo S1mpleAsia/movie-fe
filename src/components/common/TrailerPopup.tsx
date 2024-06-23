@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import { useEffect } from "react";
-import ReactPlayer from "react-player/youtube";
+import ReactPlayer from "react-player";
+import { baseEndpoint, getImage } from "../../utils/constant";
 
 type TrailerPopupProps = {
   show: boolean;
@@ -82,9 +83,12 @@ const TrailerPopup = ({
         >
           Close
         </Box>
-
         <ReactPlayer
-          url={`https://www.youtube.com/watch?v=${videoId}`}
+          url={
+            videoId?.length === 11
+              ? `https://www.youtube.com/watch?v=${videoId}`
+              : getImage(baseEndpoint, videoId || "")
+          }
           controls
           width="100%"
           height="100%"

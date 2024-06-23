@@ -12,7 +12,7 @@ const ImageHeader = ({ imgPath }: ImageHeaderProps) => {
     <Box
       className="imageHeader"
       sx={{
-        zIndex: "-1",
+        zIndex: "0",
         position: "relative",
         paddingTop: { xs: "60%", sm: "40%", md: "35%" },
         backgroundPosition: "top",

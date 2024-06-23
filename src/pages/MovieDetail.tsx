@@ -196,6 +196,7 @@ const MovieDetail = () => {
               sx={{
                 width: { xs: "100%", md: "60%" },
                 color: "text.primary",
+                zIndex: 1,
               }}
             >
               <Stack spacing={5}>
@@ -211,7 +212,12 @@ const MovieDetail = () => {
                 {/* Title */}
 
                 {/* Rate and genres */}
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  zIndex={1}
+                >
                   <CircularRate value={movie.voteAverage} />
                   <Divider orientation="vertical" />
                   {movie &&
@@ -388,7 +394,17 @@ const MovieDetail = () => {
         {/* Movie content */}
 
         <Container header="Cast">
-          <CastSlide casts={movie.credits} />
+          {movie.credits.length > 0 ? (
+            <CastSlide casts={movie.credits} />
+          ) : (
+            <Typography
+              fontSize={{ xs: "0.5rem", md: "0.5rem", lg: "1rem" }}
+              fontStyle="italic"
+              sx={{ opacity: 0.6 }}
+            >
+              No credits information
+            </Typography>
+          )}
         </Container>
 
         {/* Movie video */}

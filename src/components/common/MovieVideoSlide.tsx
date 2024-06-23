@@ -1,9 +1,10 @@
 import { Box } from "@mui/material";
 import { useEffect, useRef } from "react";
-import { videoPath } from "../../utils/constant";
+import { baseEndpoint, getImage, videoPath } from "../../utils/constant";
 import { VideoType } from "../../types/MovieType";
 import NavigationSwiper from "./NavigationSwiper";
 import { SwiperSlide } from "swiper/react";
+import ReactPlayer from "react-player";
 
 type MovieVideoProps = {
   videos: VideoType[];
@@ -25,7 +26,11 @@ const MovieVideo = ({ video }: VideoProps) => {
     <Box sx={{ height: "max-content" }}>
       <iframe
         key={video.videoKey}
-        src={videoPath(video.videoKey)}
+        src={
+          video.site !== "system"
+            ? videoPath(video.videoKey)
+            : getImage(baseEndpoint, video.videoKey)
+        }
         ref={iframeRef}
         width="100%"
         title={video.videoName}

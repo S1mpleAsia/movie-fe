@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import uiConfigs from "../configs/ui.config";
 import Container from "../components/common/Container";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { setGlobalLoading } from "../redux/features/globalLoadingSlice";
 import ReactPlayer from "react-player";
+import { baseEndpoint, getImage } from "../utils/constant";
 
 const WatchingPage = () => {
   const dispatch = useDispatch();
@@ -65,7 +66,11 @@ const WatchingPage = () => {
             }}
           >
             <ReactPlayer
-              url={`https://www.youtube.com/watch?v=${movie.trailer.videoKey}`}
+              url={
+                movie.trailer.videoKey.length === 11
+                  ? `https://www.youtube.com/watch?v=${movie.trailer.videoKey}`
+                  : getImage(baseEndpoint, movie.trailer.videoKey)
+              }
               controls
               width="100%"
               height="100%"
