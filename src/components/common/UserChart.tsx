@@ -6,12 +6,17 @@ import { number } from "yup";
 import { GeneralType } from "../../types/GeneralType";
 import { userAPI } from "../../api/modules/user.api";
 import { toast } from "react-toastify";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import timeUtils from "../../utils/time.utils";
+import dayjs from "dayjs";
 
 const UserChart = () => {
   const [monthData, setMonthData] = useState<number[]>([]);
   const [weekData, setWeekData] = useState<number[]>([]);
   const [period, setPeriod] = useState<Period>(Period.Week);
   const [xLabel, setXLabel] = useState<string[]>([]);
+  const [date, setDate] = useState<string>(timeUtils.getCurrentDate());
 
   // const monthData = [
   //   4000, 3000, 2000, 2780, 1890, 2390, 3490, 4200, 5600, 1860, 4100, 3780,
@@ -25,9 +30,10 @@ const UserChart = () => {
   }, [period]);
 
   useEffect(() => {
+    console.log(date);
     const getMonthData = async () => {
       const response: GeneralType<number[]> = (
-        await userAPI.getUserOverview(Period.Month)
+        await userAPI.getUserOverview(Period.Month, date)
       ).data;
 
       if (response.status.statusCode !== 200)
@@ -39,7 +45,7 @@ const UserChart = () => {
 
     const getWeekData = async () => {
       const response: GeneralType<number[]> = (
-        await userAPI.getUserOverview(Period.Week)
+        await userAPI.getUserOverview(Period.Week, date)
       ).data;
 
       if (response.status.statusCode !== 200)
@@ -51,14 +57,29 @@ const UserChart = () => {
 
     getMonthData();
     getWeekData();
-  }, []);
+  }, [date]);
 
   return (
     <Box flex="1">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography fontSize="1.2rem" fontWeight="600">
-          User analytics
-        </Typography>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Typography fontSize="1.5rem" fontWeight="600">
+            User analytics
+          </Typography>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              sx={{
+                "& input": {
+                  display: "none",
+                },
+                "& fieldset": {
+                  display: "none",
+                },
+              }}
+              onChange={(value) => setDate(dayjs(value).format("YYYY-MM-DD"))}
+            />
+          </LocalizationProvider>
+        </Box>
         <Box display="flex" gap={2}>
           <Button onClick={() => setPeriod(Period.Month)}>Month</Button>
           <Button onClick={() => setPeriod(Period.Week)}>Week</Button>

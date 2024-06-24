@@ -221,16 +221,18 @@ const AdminMovieDetailModal = ({ open, setOpen }: AdminMovieModalProps) => {
         )
       ).data;
 
-      if (response.status.statusCode !== 200)
+      console.log(response);
+
+      if (response.status.statusCode !== 200) {
         toast.error("Can not get movie information");
-      else {
+      } else {
         setMovie(response.data);
         setSelectedGenres(response.data.genres || []);
         setLanguage(response.data.language || "en");
       }
     };
 
-    getBasicInfo();
+    if (sessionStorage.getItem("tempId")) getBasicInfo();
   }, [sessionStorage.getItem("tempId")]);
 
   return (

@@ -3,7 +3,6 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 type CircularRateProps = {
   value: number;
 };
-
 const CircularRate = ({ value }: CircularRateProps) => {
   return (
     <Box
@@ -15,7 +14,7 @@ const CircularRate = ({ value }: CircularRateProps) => {
     >
       <CircularProgress
         variant="determinate"
-        value={value * 10}
+        value={value * 10 * 2}
         color="success"
         size={50}
       />
@@ -38,7 +37,7 @@ const CircularRate = ({ value }: CircularRateProps) => {
           fontWeight="700"
           sx={{ marginTop: "-5px" }}
         >
-          {Math.floor((value * 10) / 10)}
+          {((value * 20) / 10).toFixed(2)}
         </Typography>
       </Box>
     </Box>

@@ -109,10 +109,11 @@ export const userAPI = {
     }
   ),
 
-  getUserOverview: apiErrorHandling(async (period: Period) => {
+  getUserOverview: apiErrorHandling(async (period: Period, date: string) => {
     const response = publicClient.get(userEndpoints.getUserOverview, {
       params: {
         period: period,
+        date: date,
       },
     });
 

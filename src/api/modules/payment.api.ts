@@ -31,10 +31,11 @@ export const paymentAPI = {
     return response;
   }),
 
-  getRevenueOverview: apiErrorHandling(async (period: Period) => {
+  getRevenueOverview: apiErrorHandling(async (period: Period, date: string) => {
     const response = privateClient.get(paymentEndpoints.getRevenueOverview, {
       params: {
         period: period,
+        date: date,
       },
     });
 
