@@ -231,7 +231,7 @@ const MovieSearch = () => {
           {movies && (
             <>
               <MovieGrid movies={movies} />
-              <LoadingButton
+              {/* <LoadingButton
                 sx={{ marginTop: 8 }}
                 fullWidth
                 color="primary"
@@ -239,7 +239,7 @@ const MovieSearch = () => {
                 onClick={onLoadMore}
               >
                 Load more
-              </LoadingButton>
+              </LoadingButton> */}
             </>
           )}
         </>
