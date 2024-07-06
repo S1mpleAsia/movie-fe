@@ -25,13 +25,13 @@ const timeout = 500;
 const sortbyData: any = [
   { value: "popularity.desc", label: "Popularity Descending" },
   { value: "popularity.asc", label: "Popularity Ascending" },
-  { value: "vote_average.desc", label: "Rating Descending" },
-  { value: "vote_average.asc", label: "Rating Ascending" },
+  { value: "voteAverage.desc", label: "Rating Descending" },
+  { value: "voteAverage.asc", label: "Rating Ascending" },
   {
-    value: "release_date.desc",
+    value: "releaseDate.desc",
     label: "Release Date Descending",
   },
-  { value: "release_date.asc", label: "Release Date Ascending" },
+  { value: "releaseDate.asc", label: "Release Date Ascending" },
   { value: "title.asc", label: "Title (A-Z)" },
 ];
 

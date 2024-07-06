@@ -110,8 +110,10 @@ const ProfileLeftbar = ({ active, setActive }: ProfileLeftbarProps) => {
       else setTotalFeedback(response.data);
     };
 
-    getTotalFavourite();
-    getTotalFeedback();
+    if (user) {
+      getTotalFavourite();
+      getTotalFeedback();
+    }
   }, []);
 
   return (

@@ -103,7 +103,8 @@ const MovieDetail = () => {
         " " +
         response.data.genreList.map((genre) => genre.name).join(" ");
       getMovieList(query);
-      checkFavourite();
+      if (user) checkFavourite();
+      else setIsFavourite(false);
     };
 
     getMovie();
@@ -117,6 +118,8 @@ const MovieDetail = () => {
         navigate("/sign-in");
         setOnRequest(false);
       }, 1000);
+
+      return;
     }
 
     if (onRequest) return;
@@ -137,6 +140,10 @@ const MovieDetail = () => {
   };
 
   const onSharingClick = () => {
+    if (!user) {
+      toast.error("You have not login to system");
+      return;
+    }
     setShowSharing(true);
   };
 
@@ -311,7 +318,6 @@ const MovieDetail = () => {
                     size="large"
                     startIcon={<ShareIcon />}
                     loadingPosition="start"
-                    loading={onRequest}
                     onClick={onSharingClick}
                   />
 

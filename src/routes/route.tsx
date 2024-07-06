@@ -28,6 +28,7 @@ export const routesGen = {
   signIn: "/sign-in",
   profile: "/profile",
   message: "/message",
+  dashboard: "/admin/dashboard"
 };
 
 const routes = [

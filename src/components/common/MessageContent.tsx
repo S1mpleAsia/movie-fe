@@ -30,7 +30,23 @@ const MessageContent = ({ userMessage, bottomRef }: MessageContentProps) => {
       paddingTop="1rem"
       paddingBottom="0.5rem"
       height="100vh"
-      sx={{ overflowY: "scroll", scrollBehavior: "smooth" }}
+      sx={{
+        overflowY: "scroll",
+        scrollBehavior: "smooth",
+        scrollbarWidth: "thin",
+        "&::-webkit-scrollbar": {
+          width: "0.4em",
+        },
+        "&::-webkit-scrollbar-track": {
+          background: "#f1f1f1",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          backgroundColor: "#888",
+        },
+        "&::-webkit-scrollbar-thumb:hover": {
+          background: "#555",
+        },
+      }}
       ref={bottomRef}
     >
       {filterMessage(userMessage, chatPartnerId)?.messageDtoList.map((item) => (

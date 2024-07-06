@@ -28,7 +28,7 @@ const MessageCard = ({ externalInfo, message }: MessageCardProps) => {
       >
         <Box
           component="img"
-          src={require("../../assets/no-avatar.png")}
+          src={getImage(baseEndpoint, "no-avatar.png")}
           alt=""
           sx={{
             width: "70px",

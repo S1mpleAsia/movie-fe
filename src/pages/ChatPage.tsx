@@ -9,11 +9,14 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { GeneralType } from "../types/GeneralType";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { routesGen } from "../routes/route";
 
 const ChatPage = () => {
   const { user } = useSelector((state: RootState) => state.user);
   const [userMessage, setUserMessage] = useState<UserMessageType[]>([]);
   const [defaultScreen, setDefaultScreen] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getUserMessage = async () => {
@@ -26,7 +29,8 @@ const ChatPage = () => {
       else setUserMessage(response.data);
     };
 
-    getUserMessage();
+    if (user) getUserMessage();
+    else navigate(routesGen.home);
   }, []);
 
   return (

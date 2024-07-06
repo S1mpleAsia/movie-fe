@@ -5,6 +5,7 @@ import { UserMessageType } from "../../types/MessageType";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { CredentialType } from "../../types/CredentialType";
+import { baseEndpoint, getImage } from "../../utils/constant";
 
 type MessageHeaderProps = {
   userMessage: UserMessageType[];
@@ -25,7 +26,10 @@ const MessageHeader = ({ userMessage }: MessageHeaderProps) => {
       <Box className="leftside" display="flex" gap={2}>
         <Box
           component="img"
-          src={require("../../assets/no-avatar.png")}
+          src={getImage(
+            baseEndpoint,
+            userCredential?.imagePath || "no-avatar.png"
+          )}
           alt=""
           sx={{
             width: "70px",

@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { setChatPartnerId } from "../../redux/features/chatPartnerSlice";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { baseEndpoint, getImage } from "../../utils/constant";
 
 type InboxBoxProps = {
   message: UserMessageType;
@@ -40,7 +41,10 @@ const InboxBox = ({ message, setDefaultScreen }: InboxBoxProps) => {
     >
       <Box
         component="img"
-        src={require("../../assets/no-avatar.png")}
+        src={getImage(
+          baseEndpoint,
+          message.userCredential.imagePath || "no-avatar.png"
+        )}
         alt="Avatar"
         sx={{
           width: "70px",

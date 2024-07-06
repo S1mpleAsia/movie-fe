@@ -19,12 +19,15 @@ import { GeneralType } from "../../types/GeneralType";
 import { paymentAPI } from "../../api/modules/payment.api";
 import { LoadingButton } from "@mui/lab";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { routesGen } from "../../routes/route";
 
 const PlanDetail = () => {
   const { user } = useSelector((state: RootState) => state.user);
   const [payment, setPayment] = useState<PaymentReponseWithCredential>();
   const [activePackage, setActivePackge] = useState(0);
   const [loading, setLoading] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getPaymentDetail = async () => {
@@ -45,10 +48,16 @@ const PlanDetail = () => {
       }
     };
 
-    getPaymentDetail();
+    if (user && user.role === "ADMIN") navigate(routesGen.dashboard);
+    else if (user && user.role === "USER") getPaymentDetail();
   }, []);
 
   const onClick = async (type: PackageType) => {
+    if (!user) {
+      navigate(routesGen.signIn);
+      return;
+    }
+
     if (type === PackageType.BASIC) {
       setLoading(1);
       if (activePackage > 1) {

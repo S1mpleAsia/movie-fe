@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import tagUtils from "../../utils/tag.utils";
 import { Message, MessageType } from "../../types/MessageType";
 import { messageAPI } from "../../api/modules/message.api";
+import { baseEndpoint, getImage } from "../../utils/constant";
 
 type SharingPopupProps = {
   show: boolean;
@@ -98,9 +99,9 @@ const SharingPopup = ({ show, setShow, movieId }: SharingPopupProps) => {
       keepMounted
       onClose={handleClose}
     >
-      <DialogTitle>Sharing movie for your friends.</DialogTitle>
+      <DialogTitle>Sharing movie with your friends.</DialogTitle>
       <DialogContent>
-        <Box
+        {/* <Box
           component="input"
           type="search"
           placeholder="Search username"
@@ -111,16 +112,30 @@ const SharingPopup = ({ show, setShow, movieId }: SharingPopupProps) => {
             fontSize: "1.1rem",
             borderRadius: "8px",
           }}
-        />
+        /> */}
 
         <Box
-          marginTop="1.5rem"
+          marginTop="1rem"
           height="300px"
           width="500px"
           display="flex"
           flexDirection="column"
           sx={{
             overflowY: "scroll",
+            scrollBehavior: "smooth",
+            scrollbarWidth: "thin",
+            "&::-webkit-scrollbar": {
+              width: "0.4em",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#f1f1f1",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#888",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              background: "#555",
+            },
           }}
           gap={1.5}
         >
@@ -132,16 +147,16 @@ const SharingPopup = ({ show, setShow, movieId }: SharingPopupProps) => {
                 padding: "8px",
                 borderRadius: "10px",
                 cursor: "pointer",
-                backgroundColor: activeUser?.id === item.id ? "red" : "",
+                backgroundColor: activeUser?.id === item.id ? "#3f405c" : "",
                 "&:hover": {
-                  backgroundColor: "red",
+                  backgroundColor: "#3f405c",
                 },
               }}
               onClick={() => handleChoose(item)}
             >
               <Box
                 component="img"
-                src="http://localhost:9000/movie-system/download.jpg"
+                src={getImage(baseEndpoint, item.imagePath || "no-avatar.png")}
                 sx={{
                   width: "80px",
                   height: "80px",
